@@ -1,21 +1,16 @@
-# Tests copied from here:
-#
-# Junya Kondo / Text-Hatena - search.cpan.org
-# http://search.cpan.org/dist/Text-Hatena/
-
 jsdom = require("jsdom").jsdom
 doc = jsdom "<html><head></head><body></body></html>"
 assert = require("chai").assert
 
-require "../src/hatena-markup"
+require "../src/backlog-markup"
 
-describe 'Hatena', ->
+describe 'Backlog', ->
     describe '#parse()', ->
         h = null
         parse = (str) -> h.parse str
 
         beforeEach ->
-            h = new Hatena(doc: doc)
+            h = new Backlog(doc: doc)
 
         it 'h4', ->
             i = """
@@ -28,21 +23,21 @@ describe 'Hatena', ->
         it 'h4_2', ->
             i = """
 *Hello, World!
-This is Text::Hatena.
+This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
 <h4 class="emeb">Hello, World!</h4>
-<p>This is Text::Hatena.</p>
+<p>This is Text::Backlog.</p>
 """
         it 'h4_3', ->
             i = """ *Hello, World!
-This is Text::Hatena.
+This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
 <p> *Hello, World!</p>
-<p>This is Text::Hatena.</p>
+<p>This is Text::Backlog.</p>
 """
         it 'h4_4', ->
             i = """
@@ -68,25 +63,25 @@ Beautiful day!
             i = """
 **Hello, Japan!
 
-This is Text::Hatena.
+This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
 <h5 class="emeb">Hello, Japan!</h5>
 
-<p>This is Text::Hatena.</p>
+<p>This is Text::Backlog.</p>
 """
         it 'h6', ->
             i = """
 ***Hello, Tokyo!
 
-This is Text::Hatena.
+This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
 <h6 class="emeb">Hello, Tokyo!</h6>
 
-<p>This is Text::Hatena.</p>
+<p>This is Text::Backlog.</p>
 """
         it 'blockquote', ->
             i = """
@@ -129,28 +124,28 @@ quoted quoted
 """
         it 'blockquote4', ->
             i = """
->http://www.hatena.ne.jp/>
-Hatena
+>http://www.backlog.jp/>
+Backlog
 <<
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<blockquote title="http://www.hatena.ne.jp/" cite="http://www.hatena.ne.jp/">
-    <p>Hatena</p>
-    <cite><a href="http://www.hatena.ne.jp/">http://www.hatena.ne.jp/</a></cite>
+<blockquote title="http://www.backlog.jp/" cite="http://www.backlog.jp/">
+    <p>Backlog</p>
+    <cite><a href="http://www.backlog.jp/">http://www.backlog.jp/</a></cite>
 </blockquote>
 """
         it 'blockquote5', ->
             i = """
->http://www.hatena.ne.jp/:Hatena>
-Hatena
+>http://www.backlog.jp/:Backlog>
+Backlog
 <<
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<blockquote title="Hatena" cite="http://www.hatena.ne.jp/">
-    <p>Hatena</p>
-    <cite><a href="http://www.hatena.ne.jp/">Hatena</a></cite>
+<blockquote title="Backlog" cite="http://www.backlog.jp/">
+    <p>Backlog</p>
+    <cite><a href="http://www.backlog.jp/">Backlog</a></cite>
 </blockquote>
 """
         it 'dl', ->
@@ -345,7 +340,7 @@ Hatena
 >||
 #!/usr/bin/perl
 
-my $url = 'http://d.hatena.ne.jp/';
+my $url = 'http://www.backlog.jp/';
 ||<
 """
             # console.log(parse(i))
@@ -353,21 +348,21 @@ my $url = 'http://d.hatena.ne.jp/';
 <pre>
 #!/usr/bin/perl
 
-my $url = 'http://d.hatena.ne.jp/';
+my $url = 'http://www.backlog.jp/';
 </pre>
 """
         # it 'super_pre_fail', ->
             # i = """
 # >||
 # #!/usr/bin/perl
-# 
+#
 # my $name = 'jkondo'||<
 # """
             # # console.log(parse(i))
             # assert.equal parse(i), """
 # # <p>>||</p>
 # <p>#!/usr/bin/perl</p>
-# 
+#
 # <p>my $name = 'jkondo'||<</p>
 # </div>
 # """
@@ -376,7 +371,7 @@ my $url = 'http://d.hatena.ne.jp/';
 >|pl|
 #!/usr/bin/perl
 
-my $url = 'http://d.hatena.ne.jp/';
+my $url = 'http://www.backlog.jp/';
 ||<
 """
             # console.log(parse(i))
@@ -384,7 +379,7 @@ my $url = 'http://d.hatena.ne.jp/';
 <pre class="prettyprint lang-pl">
 #!/usr/bin/perl
 
-my $url = 'http://d.hatena.ne.jp/';
+my $url = 'http://www.backlog.jp/';
 </pre>
 """
         it 'super_pre3', ->
@@ -394,7 +389,7 @@ my $url = 'http://d.hatena.ne.jp/';
 unquoted
 <<
 - unlisted
-http://www.hatena.com/ unanchored.
+http://www.backlog.jp/ unanchored.
 ||<
 """
             # console.log(parse(i))
@@ -404,7 +399,7 @@ http://www.hatena.com/ unanchored.
 unquoted
 &lt;&lt;
 - unlisted
-http://www.hatena.com/ unanchored.
+http://www.backlog.jp/ unanchored.
 </pre>
 """
         it 'super_pre4', ->
@@ -414,8 +409,8 @@ http://www.hatena.com/ unanchored.
 unquoted
 <<
 - unlisted
-http://www.hatena.com/ unanchored.
-<a href="http://www.hatena.com/">escaped tags</a>
+http://www.backlog.jp/ unanchored.
+<a href="http://www.backlog.jp/">escaped tags</a>
 ||<
 """
             # console.log(parse(i))
@@ -425,8 +420,8 @@ http://www.hatena.com/ unanchored.
 unquoted
 &lt;&lt;
 - unlisted
-http://www.hatena.com/ unanchored.
-&lt;a href="http://www.hatena.com/"&gt;escaped tags&lt;/a&gt;
+http://www.backlog.jp/ unanchored.
+&lt;a href="http://www.backlog.jp/"&gt;escaped tags&lt;/a&gt;
 </pre>
 """
         it 'pre', ->
@@ -455,7 +450,7 @@ say 'Hello, World!';
 To: info@test.com
 Subject: This is Test.
 
-Hello, This is test from Text::Hatena.
+Hello, This is test from Text::Backlog.
  Don't reply to this email.
 
 --
@@ -468,7 +463,7 @@ jkondo
 To: info@test.com
 Subject: This is Test.
 
-Hello, This is test from Text::Hatena.
+Hello, This is test from Text::Backlog.
  Don't reply to this email.
 
 --
@@ -478,7 +473,7 @@ jkondo
         it 'table', ->
             i = """
 |*Lang|*Module|
-|Perl|Text::Hatena|
+|Perl|Text::Backlog|
 """
             # console.log(parse(i))
             assert.equal parse(i), """
@@ -489,7 +484,7 @@ jkondo
     </tr>
     <tr>
         <td>Perl</td>
-        <td>Text::Hatena</td>
+        <td>Text::Backlog</td>
     </tr>
 </table>
 """

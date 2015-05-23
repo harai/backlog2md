@@ -1,4 +1,4 @@
-var bloggerHatenaMarkup = function () {
+var bloggerBacklogMarkup = function () {
     var insertTag = function(textarea, sStartTag, sEndTag) {
         var nSelStart = textarea.selectionStart;
         var nSelEnd = textarea.selectionEnd;
@@ -82,7 +82,7 @@ var bloggerHatenaMarkup = function () {
         return !!el && isShown(el);
     };
 
-    var hatena = new Hatena({ doc: document });
+    var backlog = new Backlog({ doc: document });
     var textarea = null;
     var emEditor = null;
     var emEditorLoading = null;
@@ -450,9 +450,9 @@ var bloggerHatenaMarkup = function () {
         };
     })();
 
-    var initHatena = function() {  
+    var initBacklog = function() {  
         var BOX_SIZING = "-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;";
-        var addHatenaElements = function() {
+        var addBacklogElements = function() {
             var createLeftContainer = function() {
                 var createemEditor = function() {
                     emEditor = document.createElement("textarea");
@@ -624,7 +624,7 @@ var bloggerHatenaMarkup = function () {
         var setLinkAction = function() {
             (function() {
                 var hlc = document.createElement("div");
-                hlc.id = "hatenaLinkContainer";
+                hlc.id = "backlogLinkContainer";
                 hlc.style.display = "none";
                 hlc.addEventListener("click", function() {
                      // discard the delayed response to avoid unintended insertion
@@ -641,8 +641,8 @@ var bloggerHatenaMarkup = function () {
                 var script = document.createElement("script");
                 script.setAttribute("type", "application/javascript");
                 script.textContent = [
-                    "function bloggerHatenaMarkup_linkCallback(j) {",
-                        "var hlc = document.getElementById('hatenaLinkContainer');",
+                    "function bloggerBacklogMarkup_linkCallback(j) {",
+                        "var hlc = document.getElementById('backlogLinkContainer');",
                         "hlc.setAttribute('data-url', j.targetUrl);",
                         "hlc.setAttribute('data-title', j.pageTitle);",
                         "var event = new MouseEvent('click', { 'view': window });",
@@ -663,13 +663,13 @@ var bloggerHatenaMarkup = function () {
             };
             
             var generateLinkAuto = function(url) {
-                var reqUrl = "http://www.pagesynopsis.com/pageinfo?callback=bloggerHatenaMarkup_linkCallback&" +
+                var reqUrl = "http://www.pagesynopsis.com/pageinfo?callback=bloggerBacklogMarkup_linkCallback&" +
                     "targetUrl=" + encodeURI(url);
                 var jsonp = document.createElement("script");
                 jsonp.setAttribute("type", "application/javascript");
                 jsonp.setAttribute("src", reqUrl);
                 document.body.appendChild(jsonp);
-                // bloggerHatenaMarkup_linkCallback will be called later
+                // bloggerBacklogMarkup_linkCallback will be called later
                 loadingStateManager.startLoading();
             };
 
@@ -735,7 +735,7 @@ var bloggerHatenaMarkup = function () {
 
         mathJax.init();
         addPreviewStyles();
-        addHatenaElements();
+        addBacklogElements();
         emEditorToggler.init();
         setLinkAction();
         setDecoratorTagsAction();
@@ -752,14 +752,14 @@ var bloggerHatenaMarkup = function () {
             return !(textarea = document.getElementById("postingHtmlBox"));
         },
         postObserving: function() {
-            initHatena();
+            initBacklog();
         },
         nextState: function() {
             return postingHtmlBoxHiddenState;
         }
     });
     
-    var extractHatenaOrNull = function(str) {
+    var extractBacklogOrNull = function(str) {
         var m = str.match(/\n<!--ExtremeMarkup\r?\n([\s\S]*)\nExtremeMarkup-->/);
         if (m === null) {
             return null;
@@ -768,7 +768,7 @@ var bloggerHatenaMarkup = function () {
     };
     
     var textareaToemEditor = function() {
-        var h = extractHatenaOrNull(textarea.value);
+        var h = extractBacklogOrNull(textarea.value);
         if (h === null) {
             emEditor.value = "";
             emPreview.innerHTML = "";
@@ -783,7 +783,7 @@ var bloggerHatenaMarkup = function () {
     initState();
 
     function seePreview() {
-        var htmlPost = hatena.parse(emEditor.value);
+        var htmlPost = backlog.parse(emEditor.value);
         emPreview.innerHTML = htmlPost;
         setTextArea(htmlPost);
         mathJax.process();
@@ -812,4 +812,4 @@ var bloggerHatenaMarkup = function () {
     }
 };
 
-bloggerHatenaMarkup();
+bloggerBacklogMarkup();

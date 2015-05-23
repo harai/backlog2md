@@ -2,15 +2,15 @@ jsdom = require("jsdom").jsdom
 doc = jsdom "<html><head></head><body></body></html>"
 assert = require("chai").assert
 
-require "../../src/hatena-markup"
+require "../../src/backlog-markup"
 
-describe 'Hatena', ->
+describe 'Backlog', ->
     describe '#parse()', ->
         h = null
         parse = (str) -> h.parse str
 
         beforeEach ->
-            h = new Hatena(doc: doc)
+            h = new Backlog(doc: doc)
 
         it 'should parse center gimage with caption', ->
             i = """

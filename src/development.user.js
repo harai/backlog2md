@@ -4,6 +4,6 @@
 // @description    Description
 // @include        http://www.blogger.com/blogger.g*
 // @include        https://www.blogger.com/blogger.g*
-// @require hatena-markup.js
+// @require backlog-markup.js
 // @require blogger.js
 // ==/UserScript==

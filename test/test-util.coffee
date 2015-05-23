@@ -1,6 +1,6 @@
 assert = require("chai").assert
 
-require "../src/hatena-markup"
+require "../src/backlog-markup"
 
 describe 'String', ->
     describe '#_escapeUrlInsideBracket()', ->

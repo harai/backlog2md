@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           Extreme Markup Editor for Blogger™
 // @namespace      https://github.com/harai/
-// @description    Write blog posts with Extreme Markup, which resembles Hatena Markup and is much easier to use than Markdown.
+// @description    Write blog posts with Extreme Markup, which resembles Backlog Markup and is much easier to use than Markdown.
 // @include        http://www.blogger.com/blogger.g*
 // @include        https://www.blogger.com/blogger.g*
 // @version 0.0
@@ -23,9 +23,3 @@
 //   that code without the copy of the GNU GPL normally required by
 //   section 4, provided you include this license notice and a URL
 //   through which recipients can access the Corresponding Source.
-//
-// This script makes use of:
-//   text-hatena.js 
-//     http://tech.nitoyon.com/javascript/application/texthatena/download.html
-//   blogger-hatena-syntax.user.js 
-//     https://gist.github.com/edvakf/346427

@@ -2,15 +2,15 @@ jsdom = require("jsdom").jsdom
 doc = jsdom "<html><head></head><body></body></html>"
 assert = require("chai").assert
 
-require "../src/hatena-markup"
+require "../src/backlog-markup"
 
-describe 'Hatena', ->
+describe 'Backlog', ->
     describe '#parse()', ->
         h = null
         parse = (str) -> h.parse str
 
         beforeEach ->
-            h = new Hatena(doc: doc)
+            h = new Backlog(doc: doc)
 
         it 'should parse normal markup', ->
             i = """
@@ -19,12 +19,12 @@ describe 'Hatena', ->
 
 試しに色々入力してみてください。即座に出力画面が反映されます((Windows 版 IE6 および Firefox 1.0 でのみ確認しています))。
 
-はてな記法の変換は <a href="http://search.cpan.org/dist/Text-Hatena/">Text::Hatena</a> を JavaScript に移植した "text-hatena.js" を活用しています。
+はてな記法の変換は <a href="http://search.cpan.org/dist/Text-Backlog/">Text::Backlog</a> を JavaScript に移植した "text-backlog.js" を活用しています。
 
 *変更履歴
 |*2005/12/1|ソース機能追加 (HTMLソースを表示できます)|
 |*2005/11/21|はてな記法ワープロ完成|
-|*2005/11/13|text-hatena.js 移植開始|
+|*2005/11/13|text-backlog.js 移植開始|
 """
             # console.log(parse(i))
             assert.equal parse(i), """
@@ -33,7 +33,7 @@ describe 'Hatena', ->
 
 <p>試しに色々入力してみてください。即座に出力画面が反映されます<span class="footnote"><a href="#f1" title="Windows 版 IE6 および Firefox 1.0 でのみ確認しています" name="fn1">*1</a></span>。</p>
 
-<p>はてな記法の変換は <a href="http://search.cpan.org/dist/Text-Hatena/">Text::Hatena</a> を JavaScript に移植した "text-hatena.js" を活用しています。</p>
+<p>はてな記法の変換は <a href="http://search.cpan.org/dist/Text-Backlog/">Text::Backlog</a> を JavaScript に移植した "text-backlog.js" を活用しています。</p>
 
 <h4 class="emeb">変更履歴</h4>
 <table>
@@ -47,7 +47,7 @@ describe 'Hatena', ->
     </tr>
     <tr>
         <th>2005/11/13</th>
-        <td>text-hatena.js 移植開始</td>
+        <td>text-backlog.js 移植開始</td>
     </tr>
 </table>
 <div class="footnote">
@@ -191,11 +191,11 @@ This project is hosted on [https://github.com/harai/backlog2md:].
 
         it 'should parse link with title containing :', ->
             i = """
-This project is hosted on [https://github.com/harai/backlog2md:Text::Hatena].
+This project is hosted on [https://github.com/harai/backlog2md:Text::Backlog].
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<p>This project is hosted on <a href="https://github.com/harai/backlog2md">Text::Hatena</a>.</p>
+<p>This project is hosted on <a href="https://github.com/harai/backlog2md">Text::Backlog</a>.</p>
 """
 
         it 'should parse more', ->
