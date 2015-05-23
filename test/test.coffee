@@ -164,38 +164,38 @@ def
 
         it 'should parse link notation', ->
             i = """
-This project is hosted on [https://github.com/harai/blogger-hatena-markup:GitHub].
+This project is hosted on [https://github.com/harai/backlog2md:GitHub].
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<p>This project is hosted on <a href="https://github.com/harai/blogger-hatena-markup">GitHub</a>.</p>
+<p>This project is hosted on <a href="https://github.com/harai/backlog2md">GitHub</a>.</p>
 """
 
         it 'should parse link without title', ->
             i = """
-This project is hosted on [https://github.com/harai/blogger-hatena-markup].
+This project is hosted on [https://github.com/harai/backlog2md].
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<p>This project is hosted on <a href="https://github.com/harai/blogger-hatena-markup">https://github.com/harai/blogger-hatena-markup</a>.</p>
+<p>This project is hosted on <a href="https://github.com/harai/backlog2md">https://github.com/harai/backlog2md</a>.</p>
 """
 
         it 'should parse link without title, ended with :', ->
             i = """
-This project is hosted on [https://github.com/harai/blogger-hatena-markup:].
+This project is hosted on [https://github.com/harai/backlog2md:].
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<p>This project is hosted on <a href="https://github.com/harai/blogger-hatena-markup">https://github.com/harai/blogger-hatena-markup</a>.</p>
+<p>This project is hosted on <a href="https://github.com/harai/backlog2md">https://github.com/harai/backlog2md</a>.</p>
 """
 
         it 'should parse link with title containing :', ->
             i = """
-This project is hosted on [https://github.com/harai/blogger-hatena-markup:Text::Hatena].
+This project is hosted on [https://github.com/harai/backlog2md:Text::Hatena].
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<p>This project is hosted on <a href="https://github.com/harai/blogger-hatena-markup">Text::Hatena</a>.</p>
+<p>This project is hosted on <a href="https://github.com/harai/backlog2md">Text::Hatena</a>.</p>
 """
 
         it 'should parse more', ->

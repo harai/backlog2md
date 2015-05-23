@@ -1,7 +1,7 @@
 {
-  "name": "blogger-hatena-markup",
+  "name": "backlog2md",
   "version": "0.0.0",
-  "description": "For detailed information about this product, please visit [Extreme Markup Editor for Blogger™](http://extreme-markup.blogspot.jp/).",
+  "description": "Backlog記法をMarkdownに変換するUserScript",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -17,11 +17,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/harai/blogger-hatena-markup.git"
+    "url": "https://github.com/harai/backlog2md.git"
   },
   "author": "Akihiro HARAI",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/harai/blogger-hatena-markup/issues"
+    "url": "https://github.com/harai/backlog2md/issues"
   }
 }
