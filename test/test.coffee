@@ -3,15 +3,15 @@ assert = require("chai").assert
 require "../src/backlog-markup"
 
 describe 'Backlog', ->
-    describe '#parse()', ->
-        h = null
-        parse = (str) -> h.parse str
+  describe '#parse()', ->
+    h = null
+    parse = (str) -> h.parse str
 
-        beforeEach ->
-            h = new Backlog()
+    beforeEach ->
+      h = new Backlog()
 
-        it 'should parse normal markup', ->
-            i = """
+    it 'should parse normal markup', ->
+      i = """
 *はてな記法JavaScript
 はてな記法ワープロは JavaScript ならではの利点を生かしたダイナミックなワープロです。
 
@@ -22,8 +22,8 @@ describe 'Backlog', ->
 |2005/11/21|はてな記法ワープロ完成|
 |2005/11/13|text-backlog.js 移植開始|
 """
-            # console.log(parse(i))
-            assert.equal parse(i), """
+      # console.log(parse(i))
+      assert.equal parse(i), """
 # はてな記法JavaScript
 
 はてな記法ワープロは JavaScript ならではの利点を生かしたダイナミックなワープロです。
