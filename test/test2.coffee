@@ -1,5 +1,3 @@
-jsdom = require("jsdom").jsdom
-doc = jsdom "<html><head></head><body></body></html>"
 assert = require("chai").assert
 
 require "../src/backlog-markup"
@@ -10,36 +8,38 @@ describe 'Backlog', ->
         parse = (str) -> h.parse str
 
         beforeEach ->
-            h = new Backlog(doc: doc)
+            h = new Backlog()
 
-        it 'h4', ->
+        it '*', ->
             i = """
 *Hello, World!
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<h4 class="emeb">Hello, World!</h4>
+# Hello, World!
 """
-        it 'h4_2', ->
+        it '*_2', ->
             i = """
 *Hello, World!
 This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<h4 class="emeb">Hello, World!</h4>
-<p>This is Text::Backlog.</p>
+# Hello, World!
+
+This is Text::Backlog.
 """
-        it 'h4_3', ->
+        it '*_3', ->
             i = """ *Hello, World!
 This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<p> *Hello, World!</p>
-<p>This is Text::Backlog.</p>
+ *Hello, World!
+
+This is Text::Backlog.
 """
-        it 'h4_4', ->
+        it '*_4', ->
             i = """
 *Good morning
 
@@ -51,15 +51,15 @@ Beautiful day!
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<h4 class="emeb">Good morning</h4>
+# Good morning
 
-<p>It's morning.</p>
+It's morning.
 
-<h4 class="emeb">Good afternoon</h4>
+# Good afternoon
 
-<p>Beautiful day!</p>
+Beautiful day!
 """
-        it 'h5', ->
+        it '**', ->
             i = """
 **Hello, Japan!
 
@@ -67,11 +67,11 @@ This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<h5 class="emeb">Hello, Japan!</h5>
+## Hello, Japan!
 
-<p>This is Text::Backlog.</p>
+This is Text::Backlog.
 """
-        it 'h6', ->
+        it '***', ->
             i = """
 ***Hello, Tokyo!
 
@@ -79,101 +79,84 @@ This is Text::Backlog.
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<h6 class="emeb">Hello, Tokyo!</h6>
+### Hello, Tokyo!
 
-<p>This is Text::Backlog.</p>
+This is Text::Backlog.
 """
-        it 'blockquote', ->
+        it '****', ->
             i = """
->>
+****Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+#### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+        it '*****', ->
+            i = """
+*****Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+##### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+        it '******', ->
+            i = """
+******Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+###### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+        it '>', ->
+            i = """
+>Hi!
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+> Hi!
+"""
+        it '>_2', ->
+            i = """
+>Hi!
+>Hi-C
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+> Hi!
+> Hi-C
+"""
+        it '{quote}', ->
+            i = """
+{quote}
 quoted
-<<
+{/quote}
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<blockquote>
-    <p>quoted</p>
-</blockquote>
+> quoted
 """
-        it 'blockquote2', ->
-            i = """
->>
-quoted
->>
-quoted quoted
-<<
-<<
+        it '{quote}_2', ->
+            i = """ {quote}\n unquoted\n {/quote}
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<blockquote>
-    <p>quoted</p>
-    <blockquote>
-        <p>quoted quoted</p>
-    </blockquote>
-</blockquote>
+ {quote}
+ unquoted
+ {/quote}
 """
-        it 'blockquote3', ->
-            i = """ >>\n unquoted\n <<
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<p> >></p>
-<p> unquoted</p>
-<p> <<</p>
-"""
-        it 'blockquote4', ->
-            i = """
->http://www.backlog.jp/>
-Backlog
-<<
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<blockquote title="http://www.backlog.jp/" cite="http://www.backlog.jp/">
-    <p>Backlog</p>
-    <cite><a href="http://www.backlog.jp/">http://www.backlog.jp/</a></cite>
-</blockquote>
-"""
-        it 'blockquote5', ->
-            i = """
->http://www.backlog.jp/:Backlog>
-Backlog
-<<
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<blockquote title="Backlog" cite="http://www.backlog.jp/">
-    <p>Backlog</p>
-    <cite><a href="http://www.backlog.jp/">Backlog</a></cite>
-</blockquote>
-"""
-        it 'dl', ->
-            i = """
-:cinnamon:dog
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<dl>
-    <dt>cinnamon</dt>
-    <dd>dog</dd>
-</dl>
-"""
-        it 'dl2', ->
-            i = """
-:cinnamon:dog
-:tama:cat
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<dl>
-    <dt>cinnamon</dt>
-    <dd>dog</dd>
-    <dt>tama</dt>
-    <dd>cat</dd>
-</dl>
-"""
-        it 'ul', ->
+        it '-', ->
             i = """
 -komono
 -kyoto
@@ -181,13 +164,11 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li>komono</li>
-    <li>kyoto</li>
-    <li>shibuya</li>
-</ul>
+* komono
+* kyoto
+* shibuya
 """
-        it 'ul2', ->
+        it '-_2', ->
             i = """
 -komono
 --kyoto
@@ -196,20 +177,12 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li>komono
-        <ul>
-            <li>kyoto
-                <ul>
-                    <li>shibuya</li>
-                </ul>
-            </li>
-            <li>hachiyama</li>
-        </ul>
-    </li>
-</ul>
+* komono
+    * kyoto
+        * shibuya
+    * hachiyama
 """
-        it 'ul3', ->
+        it '-_3', ->
             i = """
 -list
 --ul
@@ -218,24 +191,20 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li>list
-        <ul>
-            <li>ul</li>
-            <li>ol</li>
-        </ul>
-    </li>
-    <li>pre</li>
-</ul>
+* list
+    * ul
+    * ol
+* pre
 """
-        it 'ul4', ->
+        it '-_4', ->
             i = " - wrong list\n - what's happen?"
             # console.log(parse(i))
             assert.equal parse(i), """
-<p> - wrong list</p>
-<p> - what's happen?</p>
+ - wrong list
+
+ - what's happen?
 """
-        it 'ul5', ->
+        it '-_5', ->
             i = """
 - right list
  - wrong list
@@ -243,13 +212,13 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li> right list</li>
-</ul>
-<p> - wrong list</p>
-<p> - what's happen?</p>
+* right list
+
+ - wrong list
+
+ - what's happen?
 """
-        it 'ul6', ->
+        it '-_6', ->
             i = """
 -Japan
 --Kyoto
@@ -259,21 +228,13 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li>Japan
-        <ul>
-            <li>Kyoto</li>
-            <li>Tokyo</li>
-        </ul>
-    </li>
-    <li>USA
-        <ul>
-            <li>Mountain View</li>
-        </ul>
-    </li>
-</ul>
+* Japan
+    * Kyoto
+    * Tokyo
+* USA
+    * Mountain View
 """
-        it 'ul7', ->
+        it '-_7', ->
             i = """
 -komono
 --kyoto
@@ -282,20 +243,12 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li>komono
-        <ul>
-            <li>kyoto
-                <ul>
-                    <li>shibuya</li>
-                </ul>
-            </li>
-            <li>hachiyama</li>
-        </ul>
-    </li>
-</ul>
+* komono
+    * kyoto
+        * shibuya
+    * hachiyama
 """
-        it 'ol', ->
+        it '+', ->
             i = """
 +Register
 +Login
@@ -303,13 +256,11 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ol>
-    <li>Register</li>
-    <li>Login</li>
-    <li>Write your blog</li>
-</ol>
+1. Register
+1. Login
+1. Write your blog
 """
-        it 'ol2', ->
+        it '+_2', ->
             i = """
 -Steps
 ++Register
@@ -320,207 +271,231 @@ Backlog
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<ul>
-    <li>Steps
-        <ol>
-            <li>Register</li>
-            <li>Login</li>
-            <li>Write your blog</li>
-        </ol>
-    </li>
-    <li>Option
-        <ul>
-            <li>180pt</li>
-        </ul>
-    </li>
-</ul>
+* Steps
+    1. Register
+    1. Login
+    1. Write your blog
+* Option
+    * 180pt
 """
-        it 'super_pre', ->
+        it '{code}', ->
             i = """
->||
+{code}
 #!/usr/bin/perl
 
 my $url = 'http://www.backlog.jp/';
-||<
+{/code}
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<pre>
+```
 #!/usr/bin/perl
 
 my $url = 'http://www.backlog.jp/';
-</pre>
+```
 """
-        # it 'super_pre_fail', ->
-            # i = """
-# >||
-# #!/usr/bin/perl
-#
-# my $name = 'jkondo'||<
-# """
-            # # console.log(parse(i))
-            # assert.equal parse(i), """
-# # <p>>||</p>
-# <p>#!/usr/bin/perl</p>
-#
-# <p>my $name = 'jkondo'||<</p>
-# </div>
-# """
-        it 'super_pre2', ->
+        it '{code}_2', ->
             i = """
->|pl|
+{code:perl}
 #!/usr/bin/perl
 
 my $url = 'http://www.backlog.jp/';
-||<
+{/code}
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<pre class="prettyprint lang-pl">
+```perl
 #!/usr/bin/perl
 
 my $url = 'http://www.backlog.jp/';
-</pre>
+```
 """
-        it 'super_pre3', ->
+        it '{code}_3', ->
             i = """
->||
->>
+{code}
+{quote}
 unquoted
-<<
+{/quote}
 - unlisted
-http://www.backlog.jp/ unanchored.
-||<
+{/code}
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<pre>
-&gt;&gt;
+```
+{quote}
 unquoted
-&lt;&lt;
+{/quote}
 - unlisted
-http://www.backlog.jp/ unanchored.
-</pre>
+```
 """
-        it 'super_pre4', ->
+        it '|', ->
             i = """
->||
->>
-unquoted
-<<
-- unlisted
-http://www.backlog.jp/ unanchored.
-<a href="http://www.backlog.jp/">escaped tags</a>
-||<
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<pre>
-&gt;&gt;
-unquoted
-&lt;&lt;
-- unlisted
-http://www.backlog.jp/ unanchored.
-&lt;a href="http://www.backlog.jp/"&gt;escaped tags&lt;/a&gt;
-</pre>
-"""
-        it 'pre', ->
-            i = """
->|
-#!/usr/bin/perl
-use strict;
-use warnings;
-
-say 'Hello, World!';
-|<
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<pre>
-#!/usr/bin/perl
-use strict;
-use warnings;
-
-say 'Hello, World!';
-</pre>
-"""
-        it 'pre2', ->
-            i = """
->|
-To: info@test.com
-Subject: This is Test.
-
-Hello, This is test from Text::Backlog.
- Don't reply to this email.
-
---
-jkondo
-|<
-"""
-            # console.log(parse(i))
-            assert.equal parse(i), """
-<pre>
-To: info@test.com
-Subject: This is Test.
-
-Hello, This is test from Text::Backlog.
- Don't reply to this email.
-
---
-jkondo
-</pre>
-"""
-        it 'table', ->
-            i = """
-|*Lang|*Module|
+|Lang|Module|
 |Perl|Text::Backlog|
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<table>
-    <tr>
-        <th>Lang</th>
-        <th>Module</th>
-    </tr>
-    <tr>
-        <td>Perl</td>
-        <td>Text::Backlog</td>
-    </tr>
-</table>
+| Lang | Module |
+|---|---|
+| Perl | Text::Backlog |
 """
-        it 'cdata', ->
+        it '|_2', ->
             i = """
-><div>no paragraph line</div><
-paragraph line
+|Lang|Module|h
+|Perl|Text::Backlog|
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<div>no paragraph line</div>
-<p>paragraph line</p>
+| Lang | Module |
+|---|---|
+| Perl | Text::Backlog |
 """
-        it 'cdata2', ->
+        it '|_3', ->
             i = """
-><blockquote>
-<p>Hello I am writing HTML tags by myself</p>
-</blockquote><
+|~No.1|aaa|bbb|
+|~No.2|ccc|ddd|
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<blockquote>
-<p>Hello I am writing HTML tags by myself</p>
-</blockquote>
+| **No.1** | aaa | bbb |
+|---|---|
+| **No.2** | ccc | ddd |
 """
-        it 'cdata3', ->
+        it '&br;', ->
             i = """
-><blockquote><
-Please add p tags for me.
-It's candy blockquote.
-></blockquote><
+aaa&br;bbb
 """
             # console.log(parse(i))
             assert.equal parse(i), """
-<blockquote>
-<p>Please add p tags for me.</p>
-<p>It's candy blockquote.</p>
-</blockquote>
+aaa bbb
+"""
+        it '#contents', ->
+            i = """
+#contents
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+[toc]
+"""
+        it '#rev()', ->
+            i = """
+#rev(11)
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+#rev(11)
+"""
+        it '#rev()_2', ->
+            i = """
+#rev(app:deadbeef)
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+#rev(app:deadbeef)
+"""
+        it '#thumbnail()', ->
+            i = """
+#thumbnail(11)
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+![][11]
+"""
+        it '#image()', ->
+            i = """
+#image(11)
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+![][11]
+"""
+        it '#image()_2', ->
+            i = """
+#image(https://www.backlog.jp/shared/img/logo_site.png)
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+![][https://www.backlog.jp/shared/img/logo_site.png]
+"""
+        it '#attach(sample.zip:11)', ->
+            i = """
+#attach(sample.zip:11)
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+[sample.zip][11]
+"""
+        it '\\(¥¥)', ->
+            i = """
+\\%\\%Not Striked\\%\\%
+\\\\Home\hoge\hoge2
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+%%Not Striked%%
+\\Home\hoge\hoge2
+"""
+        it '\'\'', ->
+            i = """
+This is ''Bold''.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+This is **Bold**.
+"""
+        it '\'\'\'', ->
+            i = """
+This is '''Italic'''.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+This is *Italic*.
+"""
+        it '%%', ->
+            i = """
+This is %%Strike%%.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+This is ~~Strike~~.
+"""
+        it '&color(red)', ->
+            i = """
+This is &color(red) { Red }.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+This is **Red**.
+"""
+        it '&color(#ffffff, #8abe00)', ->
+            i = """
+This is &color(#ffffff, #8abe00) { Background }.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+This is **Background**.
+"""
+        it '[[]]', ->
+            i = """
+[[Hoge]]
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+[[Hoge]]
+"""
+        it '[[]]_2', ->
+            i = """
+[[Backlog>http://www.backlog.jp/]] is the best.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+[Backlog](http://www.backlog.jp/) is the best.
+"""
+        it '[[]]_3', ->
+            i = """
+[[Backlog:http://www.backlog.jp/]] is the best.
+"""
+            # console.log(parse(i))
+            assert.equal parse(i), """
+[Backlog](http://www.backlog.jp/) is the best.
 """

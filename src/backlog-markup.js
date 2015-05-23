@@ -22,15 +22,6 @@ String._escapeHTML = function(s){
     return s;
 };
 
-String._escapeInsideLink = function(s) {
-    s = s.replace(/\[/g, "&#91;");
-    s = s.replace(/\]/g, "&#93;");
-    s = s.replace(/\(\(/g, "&#40;&#40;");
-    s = s.replace(/\)\)/g, "&#41;&#41;");
-    s = s.replace(/\n/, "");
-    return s;
-};
-
 String._escapeInsidePre = function(s){
     s = s.replace(/\&/g, "&amp;");
     s = s.replace(/</g, "&lt;");
@@ -46,32 +37,13 @@ String._unescapeHTML = function(s){
     return s;
 };
 
-String._escapeUrlInsideBracket = function(s) {
-    s = s.replace(/\[/g, "%5B");
-    s = s.replace(/\]/g, "%5D");
-    var isFirstTime = true;
-    s = s.replace(/\:/g, function () {
-        if (isFirstTime) {
-            isFirstTime = false;
-            return ":"; // http:<-
-        }
-        return "%3A";
-    });
-    
-    return s;
-};
 
-
-Backlog = function(args){
-    this.self = {
-        doc: args.doc
-    };
+Backlog = function(){
 };
 Backlog.prototype = {
     parse: function(text) {
         var c = new Backlog_Context({
             text: text,
-            doc: this.self.doc
         });
 
         Backlog_AliasNode.registerAliases(text, c);
@@ -100,7 +72,6 @@ Backlog_Context = function(args){
         aliases: {},
         indent: 0,
         indentStr: "    ",
-        doc: args["doc"],
     };
     this.init();
 };
@@ -178,10 +149,6 @@ Backlog_Context.prototype = {
         var res = f();
         this.self.indent -= n;
         return res;
-    },
-
-    getDocument: function() {
-        return this.self.doc;
     },
 };
 
@@ -580,7 +547,7 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
                 return { node: node, match: m };
             }
         }
-        
+
         var node;
         if (l.length == 0) {
             node = new Backlog_BrNode();
@@ -688,7 +655,7 @@ Backlog_GimageNode.getParameters = function(matchStr, id, prop, context, isInlin
     var sizes = [];
     var pos = null;
     var alt = "";
-    
+
     prop.split(/,/).forEach(function(p) {
         if (sizes.length < 2 && p.match(/^\d+$/)) {
             sizes.push(+p);
@@ -792,7 +759,7 @@ Backlog_GimageNode.prototype = Object.extend(new Backlog_SectionNode(), {
 
         var childNodes = _this._getChildNodes();
         var denyChildNodes = _this._getChildNodes(_this.denyChildNodes);
-        
+
 
         c.putLine("<figure" + getStyle() + ">");
         c.indent(function() {
@@ -828,14 +795,14 @@ Backlog_GimageNode.prototype = Object.extend(new Backlog_SectionNode(), {
                 return { node: node, match: m };
             }
         }
-        
+
         for (var i = 0; i < denyNodes.length; i++) {
             var denyNode = denyNodes[i];
             if (denyNode.canParse(line)) {
                 return null;
             }
         }
-        
+
         if (line.length == 0) {
             return null;
         }

@@ -53,7 +53,7 @@ var bloggerBacklogMarkup = function () {
     var isShown = function(el) {
         return el.offsetWidth !== 0;
     };
-    
+
     var waitLoop = function(fn) {
         var loop = function() {
             var res = fn();
@@ -89,7 +89,7 @@ var bloggerBacklogMarkup = function () {
     var emEditorCheckbox = null;
     var emPreview = null;
     var emLeftContainer = null;
-    
+
     var stateTemplate = function(args) {
         var name = args.name ? args.name : "anonymous state";
         return function() {
@@ -111,7 +111,7 @@ var bloggerBacklogMarkup = function () {
                 if (args.postObserving) {
                     args.postObserving();
                 }
-                
+
                 if (args.nextState) {
                     var nextState = args.nextState();
                     nextState();
@@ -195,12 +195,12 @@ var bloggerBacklogMarkup = function () {
             }
             var d = document.createElement("div");
             d.innerHTML = addedHtml;
-            
+
             var extractData = function(el) {
                 var pos = null;
                 var size = null;
                 var url = null;
-        
+
                 var inA = function (a) {
                     if (a.style.clear === "left" || a.style.clear === "right") {
                         pos = a.style.clear;
@@ -212,14 +212,14 @@ var bloggerBacklogMarkup = function () {
                         size = parseInt(m[1]);
                     }
                 };
-        
+
                 if (el.tagName == "DIV") {
                     pos = "center";
                     inA(el.firstElementChild);
                 } else {
                     inA(el);
                 }
-                
+
                 return {
                     pos: pos,
                     size: size,
@@ -227,22 +227,22 @@ var bloggerBacklogMarkup = function () {
                     id: generateGuid()
                 };
             };
-            
+
             var idata = [];
             for (var i = 0; i < d.childNodes.length; i++) {
                 idata.push(extractData(d.childNodes[i]));
             }
-            
+
             return idata;
         };
-        
+
         var outputToemEditor = function(imageData) {
             var str = imageData.map(function(image) {
                 return "[gimage:" + image.id + ":" + image.size +
                     (image.pos !== null ? ("," + image.pos) : "") + "]\n";
             }).join("");
             insertTextUnderCursor(emEditor, str);
-            
+
             var currentPos = emEditor.selectionStart;
             emEditor.setSelectionRange(emEditor.value.length, emEditor.value.length);
             var str2 = imageData.map(function(image) {
@@ -251,13 +251,13 @@ var bloggerBacklogMarkup = function () {
             insertTextUnderCursor(emEditor, str2);
             emEditor.setSelectionRange(currentPos, currentPos);
         };
-        
+
         var imaged = extractImageData();
         if (imaged == null) {
             return;
         }
         outputToemEditor(imaged);
-        
+
         seePreview();
     };
 
@@ -386,7 +386,7 @@ var bloggerBacklogMarkup = function () {
             emLeftContainer.style.height = emEditorToggler.isEnabled() ? "100%" : "10%";
             emPreview.style.height = emEditorToggler.isEnabled() ? "100%" : "10%";
         };
-        
+
         return {
             init: function() {
                 window.addEventListener("resize", resizeEvent);
@@ -398,7 +398,7 @@ var bloggerBacklogMarkup = function () {
 
     var mathJax = (function() {
         var bridge = null;
-        
+
         var init = function() {
             var addConfig = function() {
                 var script = document.createElement("script");
@@ -406,7 +406,7 @@ var bloggerBacklogMarkup = function () {
                 script.textContent = "MathJax.Hub.Config({ skipStartupTypeset: true });";
                 document.getElementsByTagName("head")[0].appendChild(script);
             };
-            
+
             var addInclude = function() {
                 var script = document.createElement("script");
                 script.type = "text/javascript";
@@ -450,7 +450,7 @@ var bloggerBacklogMarkup = function () {
         };
     })();
 
-    var initBacklog = function() {  
+    var initBacklog = function() {
         var BOX_SIZING = "-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;";
         var addBacklogElements = function() {
             var createLeftContainer = function() {
@@ -620,7 +620,7 @@ var bloggerBacklogMarkup = function () {
             ].join('\n');
             document.head.appendChild(style);
         };
-        
+
         var setLinkAction = function() {
             (function() {
                 var hlc = document.createElement("div");
@@ -637,7 +637,7 @@ var bloggerBacklogMarkup = function () {
                     showLink(url, String._escapeHTML(title));
                 });
                 document.body.appendChild(hlc);
-    
+
                 var script = document.createElement("script");
                 script.setAttribute("type", "application/javascript");
                 script.textContent = [
@@ -655,13 +655,11 @@ var bloggerBacklogMarkup = function () {
             })();
 
             var showLink = function(url, innerText) {
-                var text = "[" + String._escapeUrlInsideBracket(url) + ":" +
-                    String._escapeInsideLink(innerText) + "]";
-                insertTextUnderCursor(emEditor, text);
-                
+                insertTextUnderCursor(emEditor, '');
+
                 seePreview();
             };
-            
+
             var generateLinkAuto = function(url) {
                 var reqUrl = "http://www.pagesynopsis.com/pageinfo?callback=bloggerBacklogMarkup_linkCallback&" +
                     "targetUrl=" + encodeURI(url);
@@ -693,7 +691,7 @@ var bloggerBacklogMarkup = function () {
 
                 showLink(href, innerText);
             };
-            
+
             waitLoop(function() {
                 var link = null;
                 if (link = document.getElementById("link")) {
@@ -758,7 +756,7 @@ var bloggerBacklogMarkup = function () {
             return postingHtmlBoxHiddenState;
         }
     });
-    
+
     var extractBacklogOrNull = function(str) {
         var m = str.match(/\n<!--ExtremeMarkup\r?\n([\s\S]*)\nExtremeMarkup-->/);
         if (m === null) {
@@ -766,7 +764,7 @@ var bloggerBacklogMarkup = function () {
         }
         return m[1].replace(/\{\{(\d+) hyphens\}\}/g, function($0,$1) { return String.times('-', +$1); });
     };
-    
+
     var textareaToemEditor = function() {
         var h = extractBacklogOrNull(textarea.value);
         if (h === null) {
@@ -779,7 +777,7 @@ var bloggerBacklogMarkup = function () {
             emEditorToggler.enable();
         }
     };
-    
+
     initState();
 
     function seePreview() {
