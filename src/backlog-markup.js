@@ -45,21 +45,11 @@ Backlog.prototype = {
       text: text,
     });
 
-    Backlog_AliasNode.registerAliases(text, c);
-
     var node = new Backlog_SectionNode();
     node._new({
       context: c
     });
     node.parse();
-
-    if (c.getFootnotes().length != 0) {
-      var node = new Backlog_FootnoteNode();
-      node._new({
-        context: c
-      });
-      node.parse();
-    }
 
     return c.getResult();
   }
@@ -70,9 +60,7 @@ Backlog_Context = function(args) {
   this.self = {
     text: args["text"],
     resultLines: [],
-    footnotes: [],
     noparagraph: false,
-    aliases: {},
     indent: 0,
     indentStr: "    ",
   };
@@ -122,30 +110,12 @@ Backlog_Context.prototype = {
     return this.self.resultLines[this.self.resultLines.length - 1];
   },
 
-  addFootnote: function(line) {
-    this.self.footnotes.push(line);
-  },
-
-  getFootnotes: function() {
-    return this.self.footnotes;
-  },
-
   isParagraphSuppressed: function() {
     return this.self.noparagraph;
   },
 
   suppressParagraph: function(b) {
     this.self.noparagraph = b;
-  },
-
-  getAlias: function(id) {
-    return this.self.aliases[id] || null;
-  },
-
-  addAlias: function(id, url) {
-    this.self.aliases[id] = {
-      url: url
-    };
   },
 
   indent: function(f, num) {
@@ -181,28 +151,6 @@ Backlog_Node.prototype = {
 };
 
 
-Backlog_AliasNode = function() {};
-Backlog_AliasNode.registerAliases = function(text, context) {
-  text.replace(/\[alias:([\w-]+):(https?:\/\/[^\]\s]+?)\]/mg, function($0, $1, $2) {
-    context.addAlias($1, $2);
-    return "";
-  });
-};
-Backlog_AliasNode.replaceAliasesInLine = function(text) {
-  return text.replace(/\[alias:([\w-]+):(https?:\/\/[^\]\s]+?)\]/g, function($0, $1, $2) {
-    return "";
-  });
-};
-Backlog_AliasNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\[alias:([\w-]+):(https?:\/\/[^\]\s]+?)\]\s*$/,
-
-  parse: function() {
-    var c = this.self.context;
-    c.next();
-  }
-});
-
-
 Backlog_LinkNode = {
   replaceLinksInLine: function(text) {
     return text.replace(/\[(https?:\/\/[^\]\s]+?)(?::([^\]\n]*))?\]/g, function($0, url, str) {
@@ -213,23 +161,10 @@ Backlog_LinkNode = {
 
 
 Backlog_InLine = {
-  parseFootnotePart: function(text, context) {
-    // there might be a better order
+  parsePart: function(text, context) {
     text = Backlog_TexNode.replaceTexInLine(text);
     text = Backlog_GimageNode.replaceGimagesInLine(text, context);
     return Backlog_LinkNode.replaceLinksInLine(text);
-  },
-
-  parsePart: function(text, context) {
-    var fragments = Backlog_FootnoteNode.parseFootnotesInLine(text, context);
-    return fragments.map(function(f) {
-      if (!f.parseMore) {
-        return f.text;
-      }
-      var text = f.text;
-      text = Backlog_AliasNode.replaceAliasesInLine(text);
-      return Backlog_InLine.parseFootnotePart(text, context);
-    }).join("");
   }
 };
 
@@ -279,74 +214,6 @@ Backlog_DlNode.prototype = Object.extend(new Backlog_Node(), {
       }
     });
     c.putLine("</dl>");
-  }
-});
-
-
-Backlog_FootnoteNode = function() {};
-Backlog_FootnoteNode.parseFootnotesInLine = function(text, context) {
-  var foot = text.split("((");
-  var resultFragments = [];
-  var tempFragment = "";
-  for (var i = 0; i < foot.length; i++) {
-    if (i == 0) {
-      tempFragment += foot[i];
-      continue;
-    }
-    var s = foot[i].split("))", 2);
-    if (s.length != 2) {
-      tempFragment += "((" + foot[i];
-      continue;
-    }
-    var pre = foot[i - i];
-    var note = s[0];
-    var post = foot[i].substr(s[0].length + 2);
-    if (pre.match(/\)$/) && post.match(/^\(/)) {
-      tempFragment += "((" + post;
-    } else {
-      context.addFootnote(note);
-      var num = context.getFootnotes().length;
-      note = Backlog_InLine.parseFootnotePart(note);
-      note = note.replace(/<.*?>/g, "");
-      resultFragments.push({
-        parseMore: true,
-        text: tempFragment
-      });
-      var footnoteStr = '<span class="footnote"><a href="#f' + num + '" title="' + String._escapeHTML(note) +
-        '" name="fn' + num + '">*' + num + '</a></span>';
-      resultFragments.push({
-        parseMore: false,
-        text: footnoteStr
-      });
-      tempFragment = post;
-    }
-  }
-  if (tempFragment !== "") {
-    resultFragments.push({
-      parseMore: true,
-      text: tempFragment
-    });
-  }
-  return resultFragments;
-};
-Backlog_FootnoteNode.prototype = Object.extend(new Backlog_Node(), {
-  parse: function() {
-    var c = this.self.context;
-    if (c.getFootnotes().length == 0) {
-      return;
-    }
-
-    c.putLine('<div class="footnote">');
-    c.indent(function() {
-      var footnotes = c.getFootnotes();
-      for (var i = 0; i < footnotes.length; i++) {
-        var n = i + 1;
-        var l = '<p class="footnote"><a href="#fn' + n + '" name="f' + n + '">*' +
-          n + '</a>: ' + Backlog_InLine.parseFootnotePart(footnotes[i], c) + '</p>';
-        c.putLine(l);
-      }
-    });
-    c.putLine('</div>');
   }
 });
 
@@ -596,7 +463,7 @@ Backlog_BlockquoteNode.prototype = Object.extend(new Backlog_SectionNode(), {
   pattern: /^>(?:(https?:\/\/.*?)(:.*)?)?>$/,
   endPattern: /^<<$/,
   childNodes: ["h4", "h5", "h6", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", "alias", "tex"
+    "gimage", tex"
   ],
 
   parse: function(match) {
@@ -637,7 +504,7 @@ Backlog_TagNode.prototype = Object.extend(new Backlog_SectionNode(), {
   pattern: /^>(<.*)$/,
   endPattern: /^(.*>)<$/,
   childNodes: ["h4", "h5", "h6", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", "alias", "tex"
+    "gimage", tex"
   ],
 
   parse: function(match) {
@@ -721,13 +588,7 @@ Backlog_GimageNode.getParameters = function(matchStr, id, prop, context, isInlin
       throw "error";
   }
 
-  var alias = context.getAlias(id);
   var originlUrl = null;
-  var url = null;
-  if (alias !== null) {
-    originlUrl = alias.url;
-    url = size ? alias.url.replace(/\/s\d+\//, "/s" + size + "/") : originlUrl;
-  }
 
   return {
     alt: alt,
@@ -755,15 +616,11 @@ Backlog_GimageNode.prototype = Object.extend(new Backlog_SectionNode(), {
   pattern: /^\[gimage:([\w-]+)(?::([^\]]+))?\]\s*$/,
   childNodes: ["tagline", "tag"],
   denyChildNodes: ["h6", "h5", "h4", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", "alias", "more"
+    "gimage", "more"
   ],
 
   canParse: function(line) {
-    var m = line.match(this.pattern);
-    if (m == null) {
-      return null;
-    }
-    return this.self.context.getAlias(m[1]) ? m : null;
+    return null;
   },
 
   parse: function(match) {
