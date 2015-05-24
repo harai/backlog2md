@@ -45,11 +45,21 @@ Backlog.prototype = {
       text: text,
     });
 
+    Backlog_AliasNode.registerAliases(text, c);
+
     var node = new Backlog_SectionNode();
     node._new({
       context: c
     });
     node.parse();
+
+    if (c.getFootnotes().length != 0) {
+      var node = new Backlog_FootnoteNode();
+      node._new({
+        context: c
+      });
+      node.parse();
+    }
 
     return c.getResult();
   }
@@ -60,7 +70,9 @@ Backlog_Context = function(args) {
   this.self = {
     text: args["text"],
     resultLines: [],
+    footnotes: [],
     noparagraph: false,
+    aliases: {},
     indent: 0,
     indentStr: "    ",
   };
@@ -110,12 +122,30 @@ Backlog_Context.prototype = {
     return this.self.resultLines[this.self.resultLines.length - 1];
   },
 
+  addFootnote: function(line) {
+    this.self.footnotes.push(line);
+  },
+
+  getFootnotes: function() {
+    return this.self.footnotes;
+  },
+
   isParagraphSuppressed: function() {
     return this.self.noparagraph;
   },
 
   suppressParagraph: function(b) {
     this.self.noparagraph = b;
+  },
+
+  getAlias: function(id) {
+    return this.self.aliases[id] || null;
+  },
+
+  addAlias: function(id, url) {
+    this.self.aliases[id] = {
+      url: url
+    };
   },
 
   indent: function(f, num) {
@@ -161,10 +191,146 @@ Backlog_LinkNode = {
 
 
 Backlog_InLine = {
-  parsePart: function(text, context) {
-    text = Backlog_TexNode.replaceTexInLine(text);
-    text = Backlog_GimageNode.replaceGimagesInLine(text, context);
-    return Backlog_LinkNode.replaceLinksInLine(text);
+  parsePart: function(text) {
+    var decomposite = function(regexp, str) {
+      var r;
+      if (!(r = regexp.exec(str))) {
+        return {
+          before: str,
+          after: '',
+          match: [],
+        };
+      }
+      return {
+        before: str.substr(0, r.index),
+        after: str.substr(r.index + r[0].length),
+        match: r,
+      };
+    };
+
+    var PADDING = -1
+    var ITALIC = 0;
+    var BOLD = 1;
+    var STRIKE = 2;
+
+    var signs = [{
+      backlog: "'''",
+      md: '*',
+    }, {
+      backlog: "''",
+      md: '**',
+    }, {
+      backlog: '%%',
+      md: '~~',
+    }];
+
+    var lexInLine = function(text, tokens) {
+      if (text === '') {
+        return tokens;
+      }
+
+      var next;
+      var m = decomposite(/\\|'''|''|%%/, text);
+      switch (m.match[0]) {
+      case '\\':
+        if (m.after.length == 0) {
+          next = '';
+          tokens.push(m.before + '\\');
+        } else {
+          var p = m.after.substr(0, 1);
+          switch (p) {
+          case '\\':
+          case "'":
+          case '%':
+            next = m.after.substr(1);
+            tokens.push(m.before + p);
+            break;
+          default:
+            next = m.after;
+            tokens.push(m.before + '\\');
+            break;
+          }
+        }
+        break;
+      case signs[ITALIC].backlog:
+        next = m.after;
+        tokens.push(m.before);
+        tokens.push(ITALIC);
+        break;
+      case signs[BOLD].backlog:
+        next = m.after;
+        tokens.push(m.before);
+        tokens.push(BOLD);
+        break;
+      case signs[STRIKE].backlog:
+        next = m.after;
+        tokens.push(m.before);
+        tokens.push(STRIKE);
+        break;
+      default:
+        next = m.after;
+        tokens.push(m.before);
+        break;
+      }
+      return lexInLine(next, tokens);
+    };
+
+    var deLexToBacklog = function(tokens) {
+      var ts = tokens.filter(function(t) {
+        return t !== '';
+      });
+
+      var res = '';
+
+      for (var i = 0; i < ts.length; i++) {
+        if (typeof ts[i] === 'number') {
+          if (ts[i] === PADDING) {
+            if (res.match(/\s$/)) {
+              continue;
+            }
+            if (typeof ts[i + 1] === 'string' && ts[i + 1].match(/^\s/)) {
+              continue;
+            }
+            res += ' ';
+            continue;
+          }
+          res += signs[ts[i]].backlog;
+          continue;
+        }
+        res += ts[i];
+      }
+      return res;
+    };
+
+    var deLexAndSquashToMd = function(tokens, start) {
+      var middle = deLexToBacklog(tokens.slice(start + 1, -1));
+      var end = signs[tokens[tokens.length - 1]].md;
+      var begin = signs[tokens[start]].md;
+      return tokens.slice(0, start).concat(
+        [PADDING, begin + middle + end, PADDING]);
+    };
+
+    var deLexToMd = function(tokens, mdStack) {
+      if (tokens.length === 0) {
+        return deLexToBacklog(mdStack).trim();
+      }
+      var t = tokens.shift();
+      if (typeof t === 'string') {
+        mdStack.push(t);
+        return deLexToMd(tokens, mdStack);
+      }
+      mdStack.push(t);
+      for (var i = mdStack.length - 1 - 1; -1 < i; i--) {
+        if (mdStack[i] === t) {
+          mdStack = deLexAndSquashToMd(mdStack, i);
+          break;
+        }
+      }
+      return deLexToMd(tokens, mdStack);
+    };
+
+    var ts = lexInLine(text, []);
+    return deLexToMd(ts, []);
   }
 };
 
@@ -463,7 +629,7 @@ Backlog_BlockquoteNode.prototype = Object.extend(new Backlog_SectionNode(), {
   pattern: /^>(?:(https?:\/\/.*?)(:.*)?)?>$/,
   endPattern: /^<<$/,
   childNodes: ["h4", "h5", "h6", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", tex"
+    "gimage", "tex"
   ],
 
   parse: function(match) {
@@ -504,7 +670,7 @@ Backlog_TagNode.prototype = Object.extend(new Backlog_SectionNode(), {
   pattern: /^>(<.*)$/,
   endPattern: /^(.*>)<$/,
   childNodes: ["h4", "h5", "h6", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", tex"
+    "gimage", "tex"
   ],
 
   parse: function(match) {

@@ -1,6 +1,6 @@
 #!/bin/sh
 
 while inotifywait -r -e modify ./src/ ./test/; do
-  mocha --compilers coffee:coffee-script/register --recursive
+  node_modules/.bin/mocha --compilers coffee:coffee-script/register --recursive
   date
 done
