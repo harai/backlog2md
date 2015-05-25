@@ -26,21 +26,22 @@ describe 'Backlog', ->
 
     it 'same multiple', ->
       assert.equal parse("aaa''bbb'' ''ccc''ddd"), 'aaa **bbb** **ccc** ddd'
-#   describe '#parse()', ->
-#     h = null
-#     parse = (str) -> h.parse str
-#
-#     beforeEach ->
-#       h = new Backlog()
-#
-#     it '*', ->
-#       i = """
-# *Hello, World!
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# # Hello, World!
-# """
+
+  describe '#parse()', ->
+    h = null
+    parse = (str) -> h.parse str
+
+    beforeEach ->
+      h = new Backlog()
+
+    it '*', ->
+      i = """
+*Hello, '''World'''!
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+# Hello, *World* !
+"""
 #     it '*_2', ->
 #       i = """
 # *Hello, World!
@@ -82,66 +83,66 @@ describe 'Backlog', ->
 #
 # Beautiful day!
 # """
-#     it '**', ->
-#       i = """
-# **Hello, Japan!
-#
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ## Hello, Japan!
-#
-# This is Text::Backlog.
-# """
-#     it '***', ->
-#       i = """
-# ***Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ### Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#     it '****', ->
-#       i = """
-# ****Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# #### Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#     it '*****', ->
-#       i = """
-# *****Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ##### Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#     it '******', ->
-#       i = """
-# ******Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ###### Hello, Tokyo!
-#
-# This is Text::Backlog.
-# """
+    it '**', ->
+      i = """
+**Hello, Japan!
+
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+## Hello, Japan!
+
+This is Text::Backlog.
+"""
+    it '***', ->
+      i = """
+***Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+    it '****', ->
+      i = """
+****Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+#### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+    it '*****', ->
+      i = """
+*****Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+##### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+    it '******', ->
+      i = """
+******Hello, Tokyo!
+
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+###### Hello, Tokyo!
+
+This is Text::Backlog.
+"""
 #     it '>', ->
 #       i = """
 # >Hi!

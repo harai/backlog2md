@@ -45,21 +45,11 @@ Backlog.prototype = {
       text: text,
     });
 
-    Backlog_AliasNode.registerAliases(text, c);
-
     var node = new Backlog_SectionNode();
     node._new({
       context: c
     });
     node.parse();
-
-    if (c.getFootnotes().length != 0) {
-      var node = new Backlog_FootnoteNode();
-      node._new({
-        context: c
-      });
-      node.parse();
-    }
 
     return c.getResult();
   }
@@ -70,9 +60,7 @@ Backlog_Context = function(args) {
   this.self = {
     text: args["text"],
     resultLines: [],
-    footnotes: [],
     noparagraph: false,
-    aliases: {},
     indent: 0,
     indentStr: "    ",
   };
@@ -122,30 +110,12 @@ Backlog_Context.prototype = {
     return this.self.resultLines[this.self.resultLines.length - 1];
   },
 
-  addFootnote: function(line) {
-    this.self.footnotes.push(line);
-  },
-
-  getFootnotes: function() {
-    return this.self.footnotes;
-  },
-
   isParagraphSuppressed: function() {
     return this.self.noparagraph;
   },
 
   suppressParagraph: function(b) {
     this.self.noparagraph = b;
-  },
-
-  getAlias: function(id) {
-    return this.self.aliases[id] || null;
-  },
-
-  addAlias: function(id, url) {
-    this.self.aliases[id] = {
-      url: url
-    };
   },
 
   indent: function(f, num) {
@@ -283,21 +253,21 @@ Backlog_InLine = {
       var res = '';
 
       for (var i = 0; i < ts.length; i++) {
-        if (typeof ts[i] === 'number') {
-          if (ts[i] === PADDING) {
-            if (res.match(/\s$/)) {
-              continue;
-            }
-            if (typeof ts[i + 1] === 'string' && ts[i + 1].match(/^\s/)) {
-              continue;
-            }
-            res += ' ';
-            continue;
-          }
+        if (typeof ts[i] !== 'number') {
+          res += ts[i];
+          continue;
+        }
+        if (ts[i] !== PADDING) {
           res += signs[ts[i]].backlog;
           continue;
         }
-        res += ts[i];
+        if (res.match(/\s$/)) {
+          continue;
+        }
+        if (typeof ts[i + 1] === 'string' && ts[i + 1].match(/^\s/)) {
+          continue;
+        }
+        res += ' ';
       }
       return res;
     };
@@ -384,38 +354,74 @@ Backlog_DlNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_H4Node = function() {};
-Backlog_H4Node.prototype = Object.extend(new Backlog_Node(), {
+Backlog_H1Node = function() {};
+Backlog_H1Node.prototype = Object.extend(new Backlog_Node(), {
   pattern: /^\*((?:[^\*]).*)$/,
 
   parse: function(match) {
     var c = this.self.context;
     c.next();
-    c.putLine('<h4 class="emeb">' + Backlog_InLine.parsePart(match[1], c) + "</h4>");
+    c.putLine('# ' + Backlog_InLine.parsePart(match[1], c));
+  }
+});
+
+
+Backlog_H2Node = function() {};
+Backlog_H2Node.prototype = Object.extend(new Backlog_Node(), {
+  pattern: /^\*\*((?:[^\*]).*)$/,
+
+  parse: function(match) {
+    var c = this.self.context;
+    c.next();
+    c.putLine('## ' + Backlog_InLine.parsePart(match[1], c));
+  }
+});
+
+
+Backlog_H3Node = function() {};
+Backlog_H3Node.prototype = Object.extend(new Backlog_Node(), {
+  pattern: /^\*\*\*((?:[^\*]).*)$/,
+
+  parse: function(match) {
+    var c = this.self.context;
+    c.next();
+    c.putLine('### ' + Backlog_InLine.parsePart(match[1], c));
+  }
+});
+
+
+Backlog_H4Node = function() {};
+Backlog_H4Node.prototype = Object.extend(new Backlog_Node(), {
+  pattern: /^\*\*\*\*((?:[^\*]).*)$/,
+
+  parse: function(match) {
+    var c = this.self.context;
+    c.next();
+    c.putLine('#### ' + Backlog_InLine.parsePart(match[1], c));
   }
 });
 
 
 Backlog_H5Node = function() {};
 Backlog_H5Node.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\*\*((?:[^\*]).*)$/,
+  pattern: /^\*\*\*\*\*((?:[^\*]).*)$/,
 
   parse: function(match) {
     var c = this.self.context;
     c.next();
-    c.putLine('<h5 class="emeb">' + Backlog_InLine.parsePart(match[1], c) + "</h5>");
+    c.putLine('##### ' + Backlog_InLine.parsePart(match[1], c));
   }
 });
 
 
 Backlog_H6Node = function() {};
 Backlog_H6Node.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\*\*\*((?:[^\*]).*)$/,
+  pattern: /^\*\*\*\*\*\*((?:[^\*]).*)$/,
 
   parse: function(match) {
     var c = this.self.context;
     c.next();
-    c.putLine('<h6 class="emeb">' + Backlog_InLine.parsePart(match[1], c) + "</h6>");
+    c.putLine('###### ' + Backlog_InLine.parsePart(match[1], c));
   }
 });
 
@@ -470,7 +476,7 @@ Backlog_PNode = function() {};
 Backlog_PNode.prototype = Object.extend(new Backlog_Node(), {
   parse: function() {
     var c = this.self.context;
-    c.putLine("<p>" + Backlog_InLine.parsePart(c.next(), c) + "</p>");
+    c.putLine(Backlog_InLine.parsePart(c.next(), c));
   }
 });
 
@@ -560,9 +566,7 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
-  childNodes: ["h6", "h5", "h4", "blockquote", "dl", "list", "pre", "superpre", "table", "tagline", "tag",
-    "gimage", "alias", "more", "tex"
-  ],
+  childNodes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
   parse: function() {
     var _this = this;
@@ -605,19 +609,19 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
       }
     }
 
-    var node;
+    var node2;
     if (l.length == 0) {
-      node = new Backlog_BrNode();
+      node2 = new Backlog_BrNode();
     } else if (c.isParagraphSuppressed()) {
-      node = new Backlog_CDataNode();
+      node2 = new Backlog_CDataNode();
     } else {
-      node = new Backlog_PNode();
+      node2 = new Backlog_PNode();
     }
-    node._new({
+    node2._new({
       context: c
     });
     return {
-      node: node,
+      node: node2,
       match: null
     };
   }
