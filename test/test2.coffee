@@ -419,30 +419,30 @@ aaa&br;bbb
       assert.equal parse(i), """
 #rev(app:deadbeef)
 """
-#     it '#thumbnail()', ->
-#       i = """
-# #thumbnail(11)
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ![][11]
-# """
-#     it '#image()', ->
-#       i = """
-# #image(11)
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ![][11]
-# """
-#     it '#image()_2', ->
-#       i = """
-# #image(https://www.backlog.jp/shared/img/logo_site.png)
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ![][https://www.backlog.jp/shared/img/logo_site.png]
-# """
+    it '#thumbnail()', ->
+      i = """
+#thumbnail(11)
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+![][11]
+"""
+    it '#image()', ->
+      i = """
+#image(11)
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+![][11]
+"""
+    it '#image()_2', ->
+      i = """
+#image(https://www.backlog.jp/shared/img/logo_site.png)
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+![][https://www.backlog.jp/shared/img/logo_site.png]
+"""
 #     it '#attach(sample.zip:11)', ->
 #       i = """
 # #attach(sample.zip:11)

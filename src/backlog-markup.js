@@ -468,10 +468,22 @@ Backlog_ContentsNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
+Backlog_ImageNode = function() {};
+Backlog_ImageNode.prototype = Object.extend(new Backlog_Node(), {
+  pattern: /^#(?:image|thumbnail)\(([^)]+)\)\s*$/,
+
+  parse: function(match) {
+    var c = this.self.context;
+    c.next();
+    c.putLine('![][' + match[1] + ']');
+  }
+});
+
+
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
   childNodes: [
-    'hn', 'quote', 'quote2', 'list', 'code', 'table', 'contents'
+    'hn', 'quote', 'quote2', 'list', 'code', 'table', 'contents', 'image'
   ],
 
   parse: function() {
