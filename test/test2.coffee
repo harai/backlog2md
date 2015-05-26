@@ -63,26 +63,26 @@ describe 'Backlog', ->
 #
 # This is Text::Backlog.
 # """
-#     it '*_4', ->
-#       i = """
-# *Good morning
-#
-# It's morning.
-#
-# *Good afternoon
-#
-# Beautiful day!
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# # Good morning
-#
-# It's morning.
-#
-# # Good afternoon
-#
-# Beautiful day!
-# """
+    it '*_4', ->
+      i = """
+*Good morning
+
+It's morning.
+
+*Good afternoon
+
+Beautiful day!
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+# Good morning
+
+It's morning.
+
+# Good afternoon
+
+Beautiful day!
+"""
     it '**', ->
       i = """
 **Hello, Japan!
@@ -443,24 +443,24 @@ aaa&br;bbb
       assert.equal parse(i), """
 ![][https://www.backlog.jp/shared/img/logo_site.png]
 """
-#     it '#attach(sample.zip:11)', ->
-#       i = """
-# #attach(sample.zip:11)
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# [sample.zip][11]
-# """
-#     it '\\(¥¥)', ->
-#       i = """
-# \\%\\%Not Striked\\%\\%
-# \\\\Home\hoge\hoge2
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# %%Not Striked%%
-# \\Home\hoge\hoge2
-# """
+    it '#attach(sample.zip:11)', ->
+      i = """
+#attach(sample.zip:11)
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+[sample.zip][11]
+"""
+    it '\\(¥¥)', ->
+      i = """
+\\%\\%Not Striked\\%\\%
+\\\\Home\hoge\hoge2
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+%%Not Striked%%
+\\Home\hoge\hoge2
+"""
     it '\'\'', ->
       i = """
 This is ''Bold''.

@@ -303,6 +303,7 @@ Backlog_InLine = {
       return deLexToMd(tokens, mdStack);
     };
 
+    text = Backlog_AttachNode.replaceInLine(text);
     var ts = lexInLine(text, []);
     return deLexToMd(ts, []);
   }
@@ -479,6 +480,14 @@ Backlog_ImageNode.prototype = Object.extend(new Backlog_Node(), {
   }
 });
 
+
+Backlog_AttachNode = {
+  replaceInLine: function(text) {
+    return text.replace(/#attach\(([^)]+):(\d+)\)/g, function(_, name, id) {
+      return '[' + name + '][' + id + ']';
+    });
+  },
+};
 
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
