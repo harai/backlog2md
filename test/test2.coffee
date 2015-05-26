@@ -180,46 +180,46 @@ quoted
  unquoted
  {/quote}
 """
-#     it '-', ->
-#       i = """
-# -komono
-# -kyoto
-# -shibuya
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * komono
-# * kyoto
-# * shibuya
-# """
-#     it '-_2', ->
-#       i = """
-# -komono
-# --kyoto
-# ---shibuya
-# --hachiyama
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * komono
-#   * kyoto
-#     * shibuya
-#   * hachiyama
-# """
-#     it '-_3', ->
-#       i = """
-# -list
-# --ul
-# --ol
-# -pre
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * list
-#     * ul
-#     * ol
-# * pre
-# """
+    it '-', ->
+      i = """
+-komono
+-kyoto
+-shibuya
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* komono
+* kyoto
+* shibuya
+"""
+    it '-_2', ->
+      i = """
+-komono
+--kyoto
+---shibuya
+--hachiyama
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* komono
+    * kyoto
+        * shibuya
+    * hachiyama
+"""
+    it '-_3', ->
+      i = """
+-list
+--ul
+--ol
+-pre
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* list
+    * ul
+    * ol
+* pre
+"""
 #     it '-_4', ->
 #       i = " - wrong list\n - what's happen?"
 #       # console.log(parse(i))
@@ -242,66 +242,66 @@ quoted
 #
 #  - what's happen?
 # """
-#     it '-_6', ->
-#       i = """
-# -Japan
-# --Kyoto
-# --Tokyo
-# -USA
-# --Mountain View
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * Japan
-#     * Kyoto
-#     * Tokyo
-# * USA
-#     * Mountain View
-# """
-#     it '-_7', ->
-#       i = """
-# -komono
-# --kyoto
-# ---shibuya
-# --hachiyama
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * komono
-#     * kyoto
-#         * shibuya
-#     * hachiyama
-# """
-#     it '+', ->
-#       i = """
-# +Register
-# +Login
-# +Write your blog
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# 1. Register
-# 1. Login
-# 1. Write your blog
-# """
-#     it '+_2', ->
-#       i = """
-# -Steps
-# ++Register
-# ++Login
-# ++Write your blog
-# -Option
-# --180pt
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * Steps
-#     1. Register
-#     1. Login
-#     1. Write your blog
-# * Option
-#     * 180pt
-# """
+    it '-_6', ->
+      i = """
+-Japan
+--Kyoto
+--Tokyo
+-USA
+--Mountain View
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* Japan
+    * Kyoto
+    * Tokyo
+* USA
+    * Mountain View
+"""
+    it '-_7', ->
+      i = """
+-komono
+--kyoto
+---shibuya
+--hachiyama
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* komono
+    * kyoto
+        * shibuya
+    * hachiyama
+"""
+    it '+', ->
+      i = """
++Register
++Login
++Write your blog
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+1. Register
+1. Login
+1. Write your blog
+"""
+    it '+_2', ->
+      i = """
+-Steps
+++Register
+++Login
+++Write your blog
+-Option
+--180pt
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* Steps
+    1. Register
+    1. Login
+    1. Write your blog
+* Option
+    * 180pt
+"""
 #     it '{code}', ->
 #       i = """
 # {code}

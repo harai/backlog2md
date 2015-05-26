@@ -425,46 +425,18 @@ Backlog_H6Node.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_ListNode = function() {};
 Backlog_ListNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^([\-\+]+)([^>\-\+].*)$/,
+  pattern: /^([\-\+]+)\s*(.*)$/,
 
-  parse: function(match) {
-    var _this = this;
-    var c = _this.self.context;
-    var llevel = match[1].length;
-    var listType = match[1].substr(0, 1) == '-' ? 'ul' : 'ol';
+  parse: function() {
+    var c = this.self.context;
 
-    c.putLine("<" + listType + ">");
-    var l;
-    c.indent(function() {
-      while (l = c.peek()) {
-        var m;
-        if (!(m = _this.canParse(l))) {
-          break;
-        }
-        if (m[1].length == llevel) {
-          c.next();
-          var entry = m[2];
-          var l2, m2;
-          if ((l2 = c.peek()) && (m2 = _this.canParse(l2)) && m2[1].length > llevel) {
-            c.putLine("<li>" + Backlog_InLine.parsePart(m[2], c));
-          } else {
-            c.putLine("<li>" + Backlog_InLine.parsePart(m[2], c) + "</li>");
-          }
-        } else if (m[1].length > llevel) {
-          c.indent(function() {
-            var node = new Backlog_ListNode();
-            node._new({
-              context: c
-            });
-            node.parse(m);
-          });
-          c.putLine("</li>");
-        } else {
-          break;
-        }
-      }
-    });
-    c.putLine("</" + listType + ">");
+    var m;
+    while (c.hasNext() && (m = this.canParse(c.peek()))) {
+      c.next();
+      var indent = String.times('    ', m[1].length - 1);
+      var listType = m[1].substr(0, 1) == '-' ? '* ' : '1. ';
+      c.putLine(indent + listType + Backlog_InLine.parsePart(m[2], c));
+    }
   }
 });
 
@@ -495,32 +467,6 @@ Backlog_Quote2Node.prototype = Object.extend(new Backlog_Node(), {
     }
   }
 });
-
-//
-//
-// Backlog_PreNode = function() {};
-// Backlog_PreNode.prototype = Object.extend(new Backlog_Node(), {
-//   pattern: /^>\|$/,
-//   endPattern: /(.*)\|<$/,
-//
-//   parse: function(match) {
-//     var c = this.self.context;
-//     c.next();
-//     c.putLine("<pre>");
-//     var lastLine = "";
-//     while (c.hasNext()) {
-//       var l = c.peek();
-//       var m;
-//       if (m = l.match(this.endPattern)) {
-//         lastLine = m[1];
-//         c.next();
-//         break;
-//       }
-//       c.putLineWithoutIndent(Backlog_InLine.parsePart(c.next(), c));
-//     }
-//     c.putLineWithoutIndent(Backlog_InLine.parsePart(lastLine, c) + "</pre>");
-//   }
-// });
 
 
 Backlog_SuperpreNode = function() {};
@@ -583,7 +529,7 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
-  childNodes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'quote2'],
+  childNodes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'quote2', 'list'],
 
   parse: function() {
     var _this = this;
