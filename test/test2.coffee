@@ -143,43 +143,43 @@ This is Text::Backlog.
 
 This is Text::Backlog.
 """
-#     it '>', ->
-#       i = """
-# >Hi!
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# > Hi!
-# """
-#     it '>_2', ->
-#       i = """
-# >Hi!
-# >Hi-C
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# > Hi!
-# > Hi-C
-# """
-#     it '{quote}', ->
-#       i = """
-# {quote}
-# quoted
-# {/quote}
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# > quoted
-# """
-#     it '{quote}_2', ->
-#       i = """ {quote}\n unquoted\n {/quote}
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-#  {quote}
-#  unquoted
-#  {/quote}
-# """
+    it '>', ->
+      i = """
+>Hi!
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+> Hi!
+"""
+    it '>_2', ->
+      i = """
+>Hi!
+>Hi-C
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+> Hi!
+> Hi-C
+"""
+    it '{quote}', ->
+      i = """
+{quote}
+quoted
+{/quote}
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+> quoted
+"""
+    it '{quote}_2', ->
+      i = """ {quote}\n unquoted\n {/quote}
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+ {quote}
+ unquoted
+ {/quote}
+"""
 #     it '-', ->
 #       i = """
 # -komono
