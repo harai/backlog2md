@@ -403,22 +403,22 @@ aaa&br;bbb
       assert.equal parse(i), """
 [toc]
 """
-#     it '#rev()', ->
-#       i = """
-# #rev(11)
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# #rev(11)
-# """
-#     it '#rev()_2', ->
-#       i = """
-# #rev(app:deadbeef)
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# #rev(app:deadbeef)
-# """
+    it '#rev()', ->
+      i = """
+#rev(11)
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+#rev(11)
+"""
+    it '#rev()_2', ->
+      i = """
+#rev(app:deadbeef)
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+#rev(app:deadbeef)
+"""
 #     it '#thumbnail()', ->
 #       i = """
 # #thumbnail(11)
