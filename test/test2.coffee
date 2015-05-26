@@ -501,27 +501,35 @@ This is &color(#ffffff, #8abe00) { Background }.
       assert.equal parse(i), """
 This is &color(#ffffff, #8abe00) { Background }.
 """
-#     it '[[]]', ->
-#       i = """
-# [[Hoge]]
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# [[Hoge]]
-# """
-#     it '[[]]_2', ->
-#       i = """
-# [[Backlog>http://www.backlog.jp/]] is the best.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# [Backlog](http://www.backlog.jp/) is the best.
-# """
-#     it '[[]]_3', ->
-#       i = """
-# [[Backlog:http://www.backlog.jp/]] is the best.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# [Backlog](http://www.backlog.jp/) is the best.
-# """
+    it '[[]]', ->
+      i = """
+[[Hoge]]
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+[[Hoge]]
+"""
+    it '[[]]_2', ->
+      i = """
+[[Backlog>http://www.backlog.jp/]] is the best.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+[Backlog](http://www.backlog.jp/) is the best.
+"""
+    it '[[]]_3', ->
+      i = """
+[[Backlog:http://www.backlog.jp/]] is the best.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+[Backlog](http://www.backlog.jp/) is the best.
+"""
+    it '[[]]_4', ->
+      i = """
+[[Hoge[Foo]Bar]]
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+[[Hoge[Foo]Bar]]
+"""

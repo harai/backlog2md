@@ -37,6 +37,21 @@ String._unescapeHTML = function(s) {
   return s;
 };
 
+var decomposite = function(regexp, str) {
+  var r;
+  if (!(r = regexp.exec(str))) {
+    return {
+      before: str,
+      after: '',
+      match: [],
+    };
+  }
+  return {
+    before: str.substr(0, r.index),
+    after: str.substr(r.index + r[0].length),
+    match: r,
+  };
+};
 
 Backlog = function() {};
 Backlog.prototype = {
@@ -166,22 +181,6 @@ Backlog_LinkNode = {
 
 Backlog_InLine = {
   parsePart: function(text) {
-    var decomposite = function(regexp, str) {
-      var r;
-      if (!(r = regexp.exec(str))) {
-        return {
-          before: str,
-          after: '',
-          match: [],
-        };
-      }
-      return {
-        before: str.substr(0, r.index),
-        after: str.substr(r.index + r[0].length),
-        match: r,
-      };
-    };
-
     var PADDING = -1
     var ITALIC = 0;
     var BOLD = 1;
@@ -303,6 +302,7 @@ Backlog_InLine = {
       return deLexToMd(tokens, mdStack);
     };
 
+    text = Backlog_LinkNode.replaceInLine(text);
     text = Backlog_AttachNode.replaceInLine(text);
     var ts = lexInLine(text, []);
     return deLexToMd(ts, []);
@@ -489,6 +489,20 @@ Backlog_AttachNode = {
   },
 };
 
+
+Backlog_LinkNode = {
+  replaceInLine: function(text) {
+    return text.replace(/\[\[((?:[^\]]|\][^\]])+)\]\]/g, function(_, name) {
+      var m = decomposite(/[>:]([^:]+:[^:]+)$/, name);
+      if (!m.match[0]) {
+        return '[[' + name + ']]';
+      }
+      return '[' + m.before + '](' + m.match[1] + ')';
+    });
+  },
+};
+
+
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
   childNodes: [
@@ -552,129 +566,4 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
       match: null
     };
   }
-});
-
-
-Backlog_BlockquoteNode = function() {};
-Backlog_BlockquoteNode.prototype = Object.extend(new Backlog_SectionNode(), {
-  pattern: /^>(?:(https?:\/\/.*?)(:.*)?)?>$/,
-  endPattern: /^<<$/,
-  childNodes: ["h4", "h5", "h6", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", "tex"
-  ],
-
-  parse: function(match) {
-    var _this = this;
-    var c = _this.self.context;
-    var cite = null;
-    var beginTag = null;
-    if (match[1]) {
-      var url = match[1];
-      var title = String._escapeHTML(match[2] ? match[2].substr(1) : url);
-      beginTag = '<blockquote title="' + title + '" cite="' + url + '">';
-      cite = '<cite><a href="' + url + '">' + title + '</a></cite>';
-    } else {
-      beginTag = "<blockquote>";
-    }
-    c.next();
-    var nodes = _this._getChildNodes();
-    c.putLine(beginTag);
-    c.indent(function() {
-      while (c.hasNext()) {
-        if (c.peek().match(_this.endPattern)) {
-          c.next();
-          break;
-        }
-        _this._parseWithFoundNode(c.peek(), nodes);
-      }
-      if (cite) {
-        c.putLine(cite);
-      }
-    });
-    c.putLine("</blockquote>");
-  }
-});
-
-
-Backlog_TagNode = function() {};
-Backlog_TagNode.prototype = Object.extend(new Backlog_SectionNode(), {
-  pattern: /^>(<.*)$/,
-  endPattern: /^(.*>)<$/,
-  childNodes: ["h4", "h5", "h6", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", "tex"
-  ],
-
-  parse: function(match) {
-    var _this = this;
-    var c = this.self.context;
-    c.next();
-    c.suppressParagraph(true);
-    var nodes = _this._getChildNodes();
-    c.putLine(Backlog_InLine.parsePart(match[1], c));
-    while (c.hasNext()) {
-      var m2;
-      if (m2 = c.peek().match(_this.endPattern)) {
-        c.next();
-        c.putLine(Backlog_InLine.parsePart(m2[1], c));
-        break;
-      }
-      c.indent(function() {
-        _this._parseWithFoundNode(c.peek(), nodes);
-      });
-    }
-    c.suppressParagraph(false);
-  }
-});
-
-
-Backlog_TaglineNode = function() {};
-Backlog_TaglineNode.prototype = Object.extend(new Backlog_SectionNode(), {
-  pattern: /^>(<.*>)<$/,
-
-  parse: function(match) {
-    var c = this.self.context;
-    c.next();
-    c.putLine(Backlog_InLine.parsePart(match[1], c));
-  }
-});
-
-
-Backlog_MoreNode = function() {};
-Backlog_MoreNode.prototype = Object.extend(new Backlog_SectionNode(), {
-  pattern: /^={3,}\s*$/,
-
-  parse: function(match) {
-    var c = this.self.context;
-    c.next();
-    c.putLineWithoutIndent("<!-- more -->");
-    c.putLineWithoutIndent('<!--emPreview--><div class="previewOnly">&lt;!-- more --&gt;</div><!--/emPreview-->');
-  }
-});
-
-
-Backlog_TexNode = function() {};
-Backlog_TexNode.replaceTexInLine = function(text) {
-  return text.replace(/\[tex:([^\]]+)\]/g, function(matchStr, tex) {
-    return Backlog_TexNode.getTag(tex, true);
-  });
-};
-Backlog_TexNode.getTag = function(tex, isInline) {
-  // just for safety (though it won't happen)
-  tex = tex.replace(/script/g, "scri pt");
-
-  if (isInline) {
-    return '<script type="math/tex">' + tex + '</script>';
-  }
-  return '<script type="math/tex; mode=display">' + tex + '</script>';
-};
-Backlog_TexNode.prototype = Object.extend(new Backlog_SectionNode(), {
-  pattern: /^\[tex:([^\]]+)\]\s*$/,
-
-  parse: function(match) {
-    var _this = this;
-    var c = _this.self.context;
-    c.next();
-
-    c.putLine(Backlog_TexNode.getTag(match[1], false));
-  },
 });
