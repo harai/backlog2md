@@ -461,46 +461,46 @@ aaa&br;bbb
 # %%Not Striked%%
 # \\Home\hoge\hoge2
 # """
-#     it '\'\'', ->
-#       i = """
-# This is ''Bold''.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# This is **Bold**.
-# """
-#     it '\'\'\'', ->
-#       i = """
-# This is '''Italic'''.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# This is *Italic*.
-# """
-#     it '%%', ->
-#       i = """
-# This is %%Strike%%.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# This is ~~Strike~~.
-# """
-#     it '&color(red)', ->
-#       i = """
-# This is &color(red) { Red }.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# This is **Red**.
-# """
-#     it '&color(#ffffff, #8abe00)', ->
-#       i = """
-# This is &color(#ffffff, #8abe00) { Background }.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# This is **Background**.
-# """
+    it '\'\'', ->
+      i = """
+This is ''Bold''.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+This is **Bold** .
+"""
+    it '\'\'\'', ->
+      i = """
+This is '''Italic'''.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+This is *Italic* .
+"""
+    it '%%', ->
+      i = """
+This is %%Strike%%.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+This is ~~Strike~~ .
+"""
+    it '&color(red)', ->
+      i = """
+This is &color(red) { Red }.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+This is &color(red) { Red }.
+"""
+    it '&color(#ffffff, #8abe00)', ->
+      i = """
+This is &color(#ffffff, #8abe00) { Background }.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+This is &color(#ffffff, #8abe00) { Background }.
+"""
 #     it '[[]]', ->
 #       i = """
 # [[Hoge]]
