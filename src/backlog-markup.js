@@ -436,8 +436,7 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
   pattern: /^\|(.*)\|h?\s*$/,
 
   parse: function() {
-    var _this = this;
-    var c = _this.self.context;
+    var c = this.self.context;
 
     var m;
     var isFirst = true;
@@ -457,10 +456,22 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
+Backlog_ContentsNode = function() {};
+Backlog_ContentsNode.prototype = Object.extend(new Backlog_Node(), {
+  pattern: /^#contents\s*$/,
+
+  parse: function() {
+    var c = this.self.context;
+    c.next();
+    c.putLine('[toc]');
+  }
+});
+
+
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
   childNodes: [
-    'hn', 'quote', 'quote2', 'list', 'code', 'table'
+    'hn', 'quote', 'quote2', 'list', 'code', 'table', 'contents'
   ],
 
   parse: function() {

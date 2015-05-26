@@ -395,14 +395,14 @@ aaa&br;bbb
       assert.equal parse(i), """
 aaa&br;bbb
 """
-#     it '#contents', ->
-#       i = """
-# #contents
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# [toc]
-# """
+    it '#contents', ->
+      i = """
+#contents
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+[toc]
+"""
 #     it '#rev()', ->
 #       i = """
 # #rev(11)
