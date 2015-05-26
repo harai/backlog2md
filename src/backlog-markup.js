@@ -413,7 +413,7 @@ Backlog_H5Node.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_H6Node = function() {};
 Backlog_H6Node.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\*\*\*\*\*\*((?:[^\*]).*)$/,
+  pattern: /^\*{6}((?:[^\*]).*)$/,
 
   parse: function(match) {
     var c = this.self.context;
@@ -469,27 +469,48 @@ Backlog_Quote2Node.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_SuperpreNode = function() {};
-Backlog_SuperpreNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^>\|(\S*)\|$/,
-  endPattern: /^\|\|<$/,
+Backlog_CodeNode = function() {};
+Backlog_CodeNode.prototype = Object.extend(new Backlog_Node(), {
+  pattern: /^\{code(?:\:(\S*))?\}\s*$/,
+  endPattern: /^\{\/code\}\s*$/,
 
   parse: function(match) {
     var c = this.self.context;
     c.next();
-    c.putLine(match[1] !== "" ? '<pre class="prettyprint lang-' + match[1] + '">' : "<pre>"); // TODO add <code> and </code>
+    c.putLine('```' + (match[1] || ''));
     while (c.hasNext()) {
       if (c.peek().match(this.endPattern)) {
         c.next();
         break;
       }
-      c.putLineWithoutIndent(String._escapeInsidePre(c.next()));
+      c.putLine(c.next());
     }
-    c.putLineWithoutIndent("</pre>");
+    c.putLine('```');
   }
 });
 
 
+// Backlog_SuperpreNode = function() {};
+// Backlog_SuperpreNode.prototype = Object.extend(new Backlog_Node(), {
+//   pattern: /^>\|(\S*)\|$/,
+//   endPattern: /^\|\|<$/,
+//
+//   parse: function(match) {
+//     var c = this.self.context;
+//     c.next();
+//     c.putLine(match[1] !== "" ? '<pre class="prettyprint lang-' + match[1] + '">' : "<pre>"); // TODO add <code> and </code>
+//     while (c.hasNext()) {
+//       if (c.peek().match(this.endPattern)) {
+//         c.next();
+//         break;
+//       }
+//       c.putLineWithoutIndent(String._escapeInsidePre(c.next()));
+//     }
+//     c.putLineWithoutIndent("</pre>");
+//   }
+// });
+//
+//
 Backlog_TableNode = function() {};
 Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
   pattern: /^\|([^\|]*\|(?:[^\|]*\|)+)$/,
@@ -529,7 +550,9 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
-  childNodes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'quote2', 'list'],
+  childNodes: [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'quote', 'quote2', 'list', 'code'
+  ],
 
   parse: function() {
     var _this = this;

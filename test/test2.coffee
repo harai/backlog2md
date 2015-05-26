@@ -302,56 +302,56 @@ quoted
 * Option
     * 180pt
 """
-#     it '{code}', ->
-#       i = """
-# {code}
-# #!/usr/bin/perl
-#
-# my $url = 'http://www.backlog.jp/';
-# {/code}
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ```
-# #!/usr/bin/perl
-#
-# my $url = 'http://www.backlog.jp/';
-# ```
-# """
-#     it '{code}_2', ->
-#       i = """
-# {code:perl}
-# #!/usr/bin/perl
-#
-# my $url = 'http://www.backlog.jp/';
-# {/code}
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ```perl
-# #!/usr/bin/perl
-#
-# my $url = 'http://www.backlog.jp/';
-# ```
-# """
-#     it '{code}_3', ->
-#       i = """
-# {code}
-# {quote}
-# unquoted
-# {/quote}
-# - unlisted
-# {/code}
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# ```
-# {quote}
-# unquoted
-# {/quote}
-# - unlisted
-# ```
-# """
+    it '{code}', ->
+      i = """
+{code}
+#!/usr/bin/perl
+
+my $url = 'http://www.backlog.jp/';
+{/code}
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+```
+#!/usr/bin/perl
+
+my $url = 'http://www.backlog.jp/';
+```
+"""
+    it '{code}_2', ->
+      i = """
+{code:perl}
+#!/usr/bin/perl
+
+my $url = 'http://www.backlog.jp/';
+{/code}
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+```perl
+#!/usr/bin/perl
+
+my $url = 'http://www.backlog.jp/';
+```
+"""
+    it '{code}_3', ->
+      i = """
+{code}
+{quote}
+unquoted
+{/quote}
+- unlisted
+{/code}
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+```
+{quote}
+unquoted
+{/quote}
+- unlisted
+```
+"""
 #     it '|', ->
 #       i = """
 # |Lang|Module|
