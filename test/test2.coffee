@@ -352,47 +352,49 @@ unquoted
 - unlisted
 ```
 """
-#     it '|', ->
-#       i = """
-# |Lang|Module|
-# |Perl|Text::Backlog|
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# | Lang | Module |
-# |---|---|
-# | Perl | Text::Backlog |
-# """
-#     it '|_2', ->
-#       i = """
-# |Lang|Module|h
-# |Perl|Text::Backlog|
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# | Lang | Module |
-# |---|---|
-# | Perl | Text::Backlog |
-# """
-#     it '|_3', ->
-#       i = """
-# |~No.1|aaa|bbb|
-# |~No.2|ccc|ddd|
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# | **No.1** | aaa | bbb |
-# |---|---|
-# | **No.2** | ccc | ddd |
-# """
-#     it '&br;', ->
-#       i = """
-# aaa&br;bbb
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# aaa bbb
-# """
+    it '|', ->
+      i = """
+|Lang|Module|
+|Perl|Text::Backlog|
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+| Lang | Module |
+|---|---|
+| Perl | Text::Backlog |
+"""
+    it '|_2', ->
+      i = """
+|Lang|Module|h
+|Perl|Text::Backlog|
+|Ruby|backlog|
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+| Lang | Module |
+|---|---|
+| Perl | Text::Backlog |
+| Ruby | backlog |
+"""
+    it '|_3', ->
+      i = """
+|~No.1|aaa|bbb|
+|~No.2|ccc|ddd|
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+| ~No.1 | aaa | bbb |
+|---|---|---|
+| ~No.2 | ccc | ddd |
+"""
+    it '&br;', ->
+      i = """
+aaa&br;bbb
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+aaa&br;bbb
+"""
 #     it '#contents', ->
 #       i = """
 # #contents

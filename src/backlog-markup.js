@@ -433,37 +433,26 @@ Backlog_CodeNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_TableNode = function() {};
 Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\|([^\|]*\|(?:[^\|]*\|)+)$/,
+  pattern: /^\|(.*)\|h?\s*$/,
 
   parse: function() {
     var _this = this;
     var c = _this.self.context;
 
-    c.putLine("<table>");
-    c.indent(function() {
-      while (c.hasNext()) {
-        if (!_this.canParse(c.peek())) {
-          break;
-        }
-        var l = c.next();
-        c.putLine("<tr>");
-        var td = l.split("|");
-        td.pop();
-        td.shift();
-        c.indent(function() {
-          for (var i = 0; i < td.length; i++) {
-            var item = td[i];
-            if (item.match(/^\*(.*)/)) {
-              c.putLine("<th>" + Backlog_InLine.parsePart(RegExp.$1, c) + "</th>");
-            } else {
-              c.putLine("<td>" + Backlog_InLine.parsePart(item, c) + "</td>");
-            }
-          }
-        });
-        c.putLine("</tr>");
+    var m;
+    var isFirst = true;
+    while (c.hasNext() && (m = this.canParse(c.peek()))) {
+      c.next();
+      var cells = m[1].split("|");
+      var row = cells.map(function(c) {
+        return ' ' + Backlog_InLine.parsePart(c.trim(), c) + ' ';
+      }).join('|');
+      c.putLine('|' + row + '|');
+      if (isFirst) {
+        c.putLine('|' + String.times('---|', cells.length));
+        isFirst = false;
       }
-    });
-    c.putLine("</table>");
+    }
   }
 });
 
@@ -471,7 +460,7 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 Backlog_SectionNode = function() {};
 Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
   childNodes: [
-    'hn', 'quote', 'quote2', 'list', 'code'
+    'hn', 'quote', 'quote2', 'list', 'code', 'table'
   ],
 
   parse: function() {
@@ -614,180 +603,6 @@ Backlog_TaglineNode.prototype = Object.extend(new Backlog_SectionNode(), {
     var c = this.self.context;
     c.next();
     c.putLine(Backlog_InLine.parsePart(match[1], c));
-  }
-});
-
-
-Backlog_GimageNode = function() {};
-Backlog_GimageNode.replaceGimagesInLine = function(text, context) {
-  return text.replace(/\[gimage:([\w-]+)(?::([^\]]+))?\]/g, function(matchStr, id, prop) {
-    var imageProp = Backlog_GimageNode.getParameters(matchStr, id, prop, context, true);
-    return Backlog_GimageNode.getImgTag(imageProp);
-  });
-};
-Backlog_GimageNode.getParameters = function(matchStr, id, prop, context, isInline) {
-  var sizes = [];
-  var pos = null;
-  var alt = "";
-
-  prop.split(/,/).forEach(function(p) {
-    if (sizes.length < 2 && p.match(/^\d+$/)) {
-      sizes.push(+p);
-      return;
-    }
-    if (pos === null && ["center", "left", "right"].indexOf(p) !== -1) {
-      pos = p;
-      return;
-    }
-    alt = p;
-  });
-
-  var size = null;
-  var frameSize = null;
-  switch (sizes.length) {
-    case 0:
-      break;
-    case 1:
-      size = sizes[0];
-      frameSize = sizes[0];
-      break;
-    case 2:
-      if (sizes[1] < sizes[0]) {
-        size = sizes[1];
-        frameSize = sizes[0];
-      } else {
-        size = sizes[0];
-        frameSize = sizes[1];
-      }
-      break;
-    default:
-      throw "error";
-  }
-
-  var originlUrl = null;
-
-  return {
-    alt: alt,
-    size: size,
-    frameSize: frameSize,
-    pos: pos,
-    originalUrl: originlUrl,
-    url: url,
-    isInline: isInline,
-    matchStr: matchStr
-  };
-};
-Backlog_GimageNode.getImgTag = function(args) {
-  if (args.url == null) {
-    return args.matchStr;
-  }
-  var beginA = args.isInline ? "" :
-    '<div class="emebImage"><a href="' + String._escapeHTML(args.originalUrl) + '">';
-  var endA = args.isInline ? "" : "</a></div>";
-
-  return beginA + '<img src="' + String._escapeHTML(args.url) + '" alt="' +
-    String._escapeHTML(args.alt) + '" />' + endA;
-};
-Backlog_GimageNode.prototype = Object.extend(new Backlog_SectionNode(), {
-  pattern: /^\[gimage:([\w-]+)(?::([^\]]+))?\]\s*$/,
-  childNodes: ["tagline", "tag"],
-  denyChildNodes: ["h6", "h5", "h4", "blockquote", "dl", "list", "pre", "superpre", "table",
-    "gimage", "more"
-  ],
-
-  canParse: function(line) {
-    return null;
-  },
-
-  parse: function(match) {
-    var _this = this;
-    var c = _this.self.context;
-    c.next();
-
-    var imageProp = Backlog_GimageNode.getParameters(match[0], match[1], match[2], c, false);
-    var imgTag = Backlog_GimageNode.getImgTag(imageProp);
-
-    var getStyle = function() {
-      var style = "";
-      if (imageProp.pos === "center") {
-        style += ' class="emebCenter"';
-      } else if (imageProp.pos === "left") {
-        style += ' class="emebLeft"';
-      } else if (imageProp.pos === "right") {
-        style += ' class="emebRight"';
-      }
-      if (imageProp.frameSize !== null) {
-        style += ' style="width: ' + imageProp.frameSize + 'px;"';
-      }
-      return style;
-    };
-
-    var childNodes = _this._getChildNodes();
-    var denyChildNodes = _this._getChildNodes(_this.denyChildNodes);
-
-
-    c.putLine("<figure" + getStyle() + ">");
-    c.indent(function() {
-      c.putLine(imgTag);
-      var hasCaption = false;
-      while (c.hasNext()) {
-        var n = _this._findNode(c.peek(), childNodes, denyChildNodes);
-        if (n == null) {
-          break;
-        }
-        if (!hasCaption) {
-          c.putLine("<figcaption>");
-          hasCaption = true;
-        }
-        c.indent(function() {
-          n.node.parse(n.match);
-        });
-      }
-      if (hasCaption) {
-        c.putLine("</figcaption>");
-      }
-    });
-    c.putLine("</figure>");
-  },
-
-  _findNode: function(line, nodes, denyNodes) {
-    var c = this.self.context;
-
-    for (var i = 0; i < nodes.length; i++) {
-      var node = nodes[i];
-      var m;
-      if (m = node.canParse(line)) {
-        return {
-          node: node,
-          match: m
-        };
-      }
-    }
-
-    for (var i = 0; i < denyNodes.length; i++) {
-      var denyNode = denyNodes[i];
-      if (denyNode.canParse(line)) {
-        return null;
-      }
-    }
-
-    if (line.length == 0) {
-      return null;
-    }
-
-    var node;
-    if (c.isParagraphSuppressed()) {
-      node = new Backlog_CDataNode();
-    } else {
-      node = new Backlog_PNode();
-    }
-    node._new({
-      context: c
-    });
-    return {
-      node: node,
-      match: null
-    };
   }
 });
 
