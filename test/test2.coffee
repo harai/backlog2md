@@ -3,29 +3,29 @@ assert = require("chai").assert
 require "../src/backlog-markup"
 
 describe 'Backlog', ->
-  describe 'Backlog_InLine.parsePart', ->
-    parse = null
-
-    beforeEach ->
-      parse = Backlog_InLine.parsePart
-
-    it "''", ->
-      assert.equal parse("aaa''bb''ccc"), 'aaa **bb** ccc'
-
-    it "'''", ->
-      assert.equal parse("aaa'''bb'''ccc"), 'aaa *bb* ccc'
-
-    it '%%', ->
-      assert.equal parse("aaa%%bb%%ccc"), 'aaa ~~bb~~ ccc'
-
-    it 'multiple', ->
-      assert.equal parse("aaa''bbb''%%ccc%%ddd"), 'aaa **bbb** ~~ccc~~ ddd'
-
-    it 'nested', ->
-      assert.equal parse("a''a'''a%%bb%%c'''c''c"), 'a **a *a ~~bb~~ c* c** c'
-
-    it 'same multiple', ->
-      assert.equal parse("aaa''bbb'' ''ccc''ddd"), 'aaa **bbb** **ccc** ddd'
+  # describe 'Backlog_InLine.parsePart', ->
+  #   parse = null
+  #
+  #   beforeEach ->
+  #     parse = Backlog_InLine.parsePart
+  #
+  #   it "''", ->
+  #     assert.equal parse("aaa''bb''ccc"), 'aaa **bb** ccc'
+  #
+  #   it "'''", ->
+  #     assert.equal parse("aaa'''bb'''ccc"), 'aaa *bb* ccc'
+  #
+  #   it '%%', ->
+  #     assert.equal parse("aaa%%bb%%ccc"), 'aaa ~~bb~~ ccc'
+  #
+  #   it 'multiple', ->
+  #     assert.equal parse("aaa''bbb''%%ccc%%ddd"), 'aaa **bbb** ~~ccc~~ ddd'
+  #
+  #   it 'nested', ->
+  #     assert.equal parse("a''a'''a%%bb%%c'''c''c"), 'a **a *a ~~bb~~ c* c** c'
+  #
+  #   it 'same multiple', ->
+  #     assert.equal parse("aaa''bbb'' ''ccc''ddd"), 'aaa **bbb** **ccc** ddd'
 
   describe '#parse()', ->
     h = null
@@ -42,27 +42,26 @@ describe 'Backlog', ->
       assert.equal parse(i), """
 # Hello, *World* !
 """
-#     it '*_2', ->
-#       i = """
-# *Hello, World!
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# # Hello, World!
-#
-# This is Text::Backlog.
-# """
-#     it '*_3', ->
-#       i = """ *Hello, World!
-# This is Text::Backlog.
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-#  *Hello, World!
-#
-# This is Text::Backlog.
-# """
+    it '*_2', ->
+      i = """
+*Hello, World!
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+# Hello, World!
+
+This is Text::Backlog.
+"""
+    it '*_3', ->
+      i = """ *Hello, World!
+This is Text::Backlog.
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+ *Hello, World!
+This is Text::Backlog.
+"""
     it '*_4', ->
       i = """
 *Good morning
@@ -71,6 +70,23 @@ It's morning.
 
 *Good afternoon
 
+Beautiful day!
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+# Good morning
+
+It's morning.
+
+# Good afternoon
+
+Beautiful day!
+"""
+    it '*_5', ->
+      i = """
+*Good morning
+It's morning.
+*Good afternoon
 Beautiful day!
 """
       # console.log(parse(i))
@@ -220,28 +236,26 @@ quoted
     * ol
 * pre
 """
-#     it '-_4', ->
-#       i = " - wrong list\n - what's happen?"
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-#  - wrong list
-#
-#  - what's happen?
-# """
-#     it '-_5', ->
-#       i = """
-# - right list
-#  - wrong list
-#  - what's happen?
-# """
-#       # console.log(parse(i))
-#       assert.equal parse(i), """
-# * right list
-#
-#  - wrong list
-#
-#  - what's happen?
-# """
+    it '-_4', ->
+      i = " - wrong list\n - what's happen?"
+      # console.log(parse(i))
+      assert.equal parse(i), """
+ - wrong list
+ - what's happen?
+"""
+    it '-_5', ->
+      i = """
+- right list
+ - wrong list
+ - what's happen?
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+* right list
+
+- wrong list
+- what's happen?
+"""
     it '-_6', ->
       i = """
 -Japan
@@ -525,11 +539,32 @@ This is &color(#ffffff, #8abe00) { Background }.
       assert.equal parse(i), """
 [Backlog](http://www.backlog.jp/) is the best.
 """
-    it '[[]]_4', ->
+    it 'paragraph', ->
       i = """
-[[Hoge[Foo]Bar]]
+*title
+aaa
+bbb
 """
       # console.log(parse(i))
       assert.equal parse(i), """
-[[Hoge[Foo]Bar]]
+# title
+
+aaa
+bbb
+"""
+    it 'paragraph_2', ->
+      i = """
+*title
+
+aaa
+
+bbb
+"""
+      # console.log(parse(i))
+      assert.equal parse(i), """
+# title
+
+aaa
+
+bbb
 """

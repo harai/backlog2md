@@ -75,9 +75,8 @@ Backlog_Context = function(args) {
   this.self = {
     text: args["text"],
     resultLines: [],
-    noparagraph: false,
-    indent: 0,
-    indentStr: "    ",
+    prevIsParagraph: null,
+    blanklineCount: 0,
   };
   this.init();
 };
@@ -100,7 +99,9 @@ Backlog_Context.prototype = {
 
   setInputText: function(text) {
     this.self.text = text.replace(/\r/g, "");
-    this.self.lines = this.self.text.split('\n');
+    this.self.lines = this.self.text.split('\n').map(function(l) {
+      return decomposite(/\s*$/, l).before;
+    });
     this.self.index = -1;
   },
 
@@ -108,41 +109,35 @@ Backlog_Context.prototype = {
     return this.self.resultLines.join("\n");
   },
 
-  putLineWithIndent: function(line) {
-    if (this.self.noparagraph) {
-      this.self.resultLines.push(line);
-      return;
+  getLastPut: function() {
+    if (this.self.resultLines.length == 0) {
+      return null;
     }
-    var iStr = String.times(this.self.indentStr, this.self.indent);
-    this.self.resultLines.push(iStr + line);
-  },
-
-  putLineWithoutIndent: function(line) {
-    this.self.resultLines.push(line);
+    return this.self.resultLines[this.self.resultLines.length - 1];
   },
 
   putLine: function(line) {
     this.self.resultLines.push(line);
   },
 
-  getLastPut: function() {
-    return this.self.resultLines[this.self.resultLines.length - 1];
+  stackBlankline: function() {
+    this.self.blanklineCount++;
   },
 
-  isParagraphSuppressed: function() {
-    return this.self.noparagraph;
-  },
-
-  suppressParagraph: function(b) {
-    this.self.noparagraph = b;
-  },
-
-  indent: function(f, num) {
-    var n = (num == null) ? 1 : num;
-    this.self.indent += n;
-    var res = f();
-    this.self.indent -= n;
-    return res;
+  processBlanklines: function(nextIsParagraph) {
+    try {
+      if (this.self.prevIsParagraph === null) {
+        return;
+      }
+      if (this.self.prevIsParagraph &&
+        nextIsParagraph && 0 == this.self.blanklineCount) {
+        return;
+      }
+      this.putLine('');
+    } finally {
+      this.self.prevIsParagraph = nextIsParagraph;
+      this.self.blanklineCount = 0;
+    }
   },
 };
 
@@ -310,33 +305,6 @@ Backlog_InLine = {
 };
 
 
-Backlog_BrNode = function() {};
-Backlog_BrNode.prototype = Object.extend(new Backlog_Node(), {
-  parse: function() {
-    var c = this.self.context;
-    var l = c.next();
-    if (l.length != 0) {
-      return;
-    }
-    var t = String.times(c.indentStr, c.indent);
-    if (c.getLastPut() == t + "<br />" || c.getLastPut() == t) {
-      c.putLine("<br />");
-    } else {
-      c.putLineWithoutIndent("", true);
-    }
-  }
-});
-
-
-Backlog_CDataNode = function() {};
-Backlog_CDataNode.prototype = Object.extend(new Backlog_Node(), {
-  parse: function() {
-    var c = this.self.context;
-    c.putLine(c.next());
-  }
-});
-
-
 Backlog_QuoteNode = function() {};
 Backlog_QuoteNode.prototype = Object.extend(new Backlog_Node(), {
   pattern: /^>\s*(.*)$/,
@@ -383,19 +351,10 @@ Backlog_ListNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_PNode = function() {};
-Backlog_PNode.prototype = Object.extend(new Backlog_Node(), {
-  parse: function() {
-    var c = this.self.context;
-    c.putLine(Backlog_InLine.parsePart(c.next(), c));
-  }
-});
-
-
 Backlog_Quote2Node = function() {};
 Backlog_Quote2Node.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\{quote\}\s*$/,
-  endPattern: /^\{\/quote\}\s*$/,
+  pattern: /^\{quote\}$/,
+  endPattern: /^\{\/quote\}$/,
 
   parse: function() {
     var c = this.self.context;
@@ -413,8 +372,8 @@ Backlog_Quote2Node.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_CodeNode = function() {};
 Backlog_CodeNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\{code(?:\:(\S*))?\}\s*$/,
-  endPattern: /^\{\/code\}\s*$/,
+  pattern: /^\{code(?:\:(\S*))?\}$/,
+  endPattern: /^\{\/code\}$/,
 
   parse: function(match) {
     var c = this.self.context;
@@ -434,7 +393,7 @@ Backlog_CodeNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_TableNode = function() {};
 Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^\|(.*)\|h?\s*$/,
+  pattern: /^\|(.*)\|h?$/,
 
   parse: function() {
     var c = this.self.context;
@@ -459,7 +418,7 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_ContentsNode = function() {};
 Backlog_ContentsNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^#contents\s*$/,
+  pattern: /^#contents$/,
 
   parse: function() {
     var c = this.self.context;
@@ -471,7 +430,7 @@ Backlog_ContentsNode.prototype = Object.extend(new Backlog_Node(), {
 
 Backlog_ImageNode = function() {};
 Backlog_ImageNode.prototype = Object.extend(new Backlog_Node(), {
-  pattern: /^#(?:image|thumbnail)\(([^)]+)\)\s*$/,
+  pattern: /^#(?:image|thumbnail)\(([^)]+)\)$/,
 
   parse: function(match) {
     var c = this.self.context;
@@ -501,6 +460,14 @@ Backlog_LinkNode = {
     });
   },
 };
+
+Backlog_PNode = function() {};
+Backlog_PNode.prototype = Object.extend(new Backlog_Node(), {
+  parse: function() {
+    var c = this.self.context;
+    c.putLine(Backlog_InLine.parsePart(c.next(), c));
+  }
+});
 
 
 Backlog_SectionNode = function() {};
@@ -533,6 +500,9 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
 
   _parseWithFoundNode: function(l, nodes) {
     var n = this._findNode(l, nodes);
+    if (n === null) {
+      return;
+    }
     n.node.parse(n.match);
   },
 
@@ -543,6 +513,7 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
       var node = nodes[i];
       var m;
       if (m = node.canParse(l)) {
+        c.processBlanklines(false);
         return {
           node: node,
           match: m
@@ -550,19 +521,17 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
       }
     }
 
-    var node2;
-    if (l.length == 0) {
-      node2 = new Backlog_BrNode();
-    } else if (c.isParagraphSuppressed()) {
-      node2 = new Backlog_CDataNode();
-    } else {
-      node2 = new Backlog_PNode();
+    if (l.length === 0) {
+      c.stackBlankline();
+      c.next();
+      return null;
     }
-    node2._new({
-      context: c
-    });
+
+    c.processBlanklines(true);
+    var pnode = new Backlog_PNode();
+    pnode._new({context: c});
     return {
-      node: node2,
+      node: pnode,
       match: null
     };
   }
