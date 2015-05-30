@@ -13,4 +13,4 @@ rm -fr temp/_locales
 cp output/icon_128.png temp/
 cp -R output/_locales temp/
 cd temp
-zip -FSr ../output/b2m-chrome.zip backlog2md.user.js manifest.json icon_128.png _locales
+zip -FSr ../output/backlog2md-chrome.zip backlog2md.user.js manifest.json icon_128.png _locales

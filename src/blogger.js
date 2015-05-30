@@ -9,9 +9,9 @@ var bloggerBacklogMarkup = function() {
     b.classList.add('Btn-gray');
     var msg = document.createTextNode('Markdownに変換')
     b.appendChild(msg);
-    b.style.padding = '3px 30px';
-    b.style.marginLeft = '30px';
-
+    b.style.padding = '5px 30px';
+    b.style.margin = '0 30px';
+    b.style.float = 'left';
     b.id = 'backlog2md';
     b.addEventListener('click', function (event) {
       event.preventDefault();
@@ -29,12 +29,12 @@ var bloggerBacklogMarkup = function() {
 
     var observer = new MutationObserver(function() {
       selectors.forEach(function (s) {
-        jQuery(s.selector).each(function () {
-          if (jQuery.inArray(this, foundNodes) !== -1) {
+        Array.prototype.forEach.call(s.target.querySelectorAll(s.selector), function (e) {
+          if (foundNodes.indexOf(e) !== -1) {
             return;
           }
-          foundNodes.push(this);
-          s.callback(this);
+          foundNodes.push(e);
+          s.callback(e);
         });
       });
     });
@@ -43,7 +43,8 @@ var bloggerBacklogMarkup = function() {
       add: function (selector, target, callback) {
         selectors.push({
           selector: selector,
-          callback: callback
+          callback: callback,
+          target: target
         });
 
         if (target) {
