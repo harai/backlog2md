@@ -1,5 +1,3 @@
-console.log('hoge');
-
 var bloggerBacklogMarkup = function() {
   var insertBefore = function(base, inserting) {
     base.parentNode.insertBefore(inserting, base);
@@ -10,6 +8,9 @@ var bloggerBacklogMarkup = function() {
     b.classList.add('Btn-gray');
     var msg = document.createTextNode('Markdownに変換')
     b.appendChild(msg);
+    b.style.padding = '3px 30px';
+    b.style.marginLeft = '30px';
+
     b.id = 'backlog2md';
     b.addEventListener('click', function (event) {
       event.preventDefault();
