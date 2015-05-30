@@ -1,18 +1,19 @@
 // from prototype.js
-Object.extend = function(destination, source) {
+var extendObject = function(destination, source) {
   for (property in source) {
     destination[property] = source[property];
   }
   return destination;
 };
 
-String.times = function(str, time) {
+var strUtil = {};
+strUtil.times = function(str, time) {
   var s = "";
   for (var i = 0; i < time; i++) s += str;
   return s;
 };
 
-String._escapeHTML = function(s) {
+strUtil._escapeHTML = function(s) {
   s = s.replace(/\&/g, "&amp;");
   s = s.replace(/</g, "&lt;");
   s = s.replace(/>/g, "&gt;");
@@ -22,14 +23,14 @@ String._escapeHTML = function(s) {
   return s;
 };
 
-String._escapeInsidePre = function(s) {
+strUtil._escapeInsidePre = function(s) {
   s = s.replace(/\&/g, "&amp;");
   s = s.replace(/</g, "&lt;");
   s = s.replace(/>/g, "&gt;");
   return s;
 };
 
-String._unescapeHTML = function(s) {
+strUtil._unescapeHTML = function(s) {
   s = s.replace(/&amp;/g, "&");
   s = s.replace(/&lt;/g, "<");
   s = s.replace(/&gt;/g, ">");
@@ -53,7 +54,7 @@ var decomposite = function(regexp, str) {
   };
 };
 
-Backlog = function() {};
+var Backlog = function() {};
 Backlog.prototype = {
   parse: function(text) {
     var c = new Backlog_Context({
@@ -71,7 +72,7 @@ Backlog.prototype = {
 };
 
 
-Backlog_Context = function(args) {
+var Backlog_Context = function(args) {
   this.self = {
     text: args["text"],
     resultLines: [],
@@ -142,7 +143,7 @@ Backlog_Context.prototype = {
 };
 
 
-Backlog_Node = function() {};
+var Backlog_Node = function() {};
 Backlog_Node.prototype = {
   pattern: "",
 
@@ -165,16 +166,16 @@ Backlog_Node.prototype = {
 };
 
 
-Backlog_LinkNode = {
+var Backlog_LinkNode = {
   replaceLinksInLine: function(text) {
     return text.replace(/\[(https?:\/\/[^\]\s]+?)(?::([^\]\n]*))?\]/g, function($0, url, str) {
-      return '<a href="' + String._escapeHTML(url) + '">' + (str ? str : url) + '</a>';
+      return '<a href="' + strUtil._escapeHTML(url) + '">' + (str ? str : url) + '</a>';
     });
   },
 };
 
 
-Backlog_InLine = {
+var Backlog_InLine = {
   parsePart: function(text) {
     var PADDING = -1
     var ITALIC = 0;
@@ -305,8 +306,8 @@ Backlog_InLine = {
 };
 
 
-Backlog_QuoteNode = function() {};
-Backlog_QuoteNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_QuoteNode = function() {};
+Backlog_QuoteNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^>\s*(.*)$/,
 
   parse: function() {
@@ -320,21 +321,21 @@ Backlog_QuoteNode.prototype = Object.extend(new Backlog_Node(), {
   }
 });
 
-Backlog_HnNode = function() {};
-Backlog_HnNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_HnNode = function() {};
+Backlog_HnNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^(\*{1,6})\s*(.*)$/,
 
   parse: function(match) {
     var c = this.self.context;
     c.next();
-    var depth = String.times('#', match[1].length);
+    var depth = strUtil.times('#', match[1].length);
     c.putLine(depth + ' ' + Backlog_InLine.parsePart(match[2], c));
   }
 });
 
 
-Backlog_ListNode = function() {};
-Backlog_ListNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_ListNode = function() {};
+Backlog_ListNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^([\-\+]+)\s*(.*)$/,
 
   parse: function() {
@@ -343,7 +344,7 @@ Backlog_ListNode.prototype = Object.extend(new Backlog_Node(), {
     var m;
     while (c.hasNext() && (m = this.canParse(c.peek()))) {
       c.next();
-      var indent = String.times('    ', m[1].length - 1);
+      var indent = strUtil.times('    ', m[1].length - 1);
       var listType = m[1].substr(0, 1) == '-' ? '* ' : '1. ';
       c.putLine(indent + listType + Backlog_InLine.parsePart(m[2], c));
     }
@@ -351,8 +352,8 @@ Backlog_ListNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_Quote2Node = function() {};
-Backlog_Quote2Node.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_Quote2Node = function() {};
+Backlog_Quote2Node.prototype = extendObject(new Backlog_Node(), {
   pattern: /^\{quote\}$/,
   endPattern: /^\{\/quote\}$/,
 
@@ -370,8 +371,8 @@ Backlog_Quote2Node.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_CodeNode = function() {};
-Backlog_CodeNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_CodeNode = function() {};
+Backlog_CodeNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^\{code(?:\:(\S*))?\}$/,
   endPattern: /^\{\/code\}$/,
 
@@ -391,8 +392,8 @@ Backlog_CodeNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_TableNode = function() {};
-Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_TableNode = function() {};
+Backlog_TableNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^\|(.*)\|h?$/,
 
   parse: function() {
@@ -408,7 +409,7 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
       }).join('|');
       c.putLine('|' + row + '|');
       if (isFirst) {
-        c.putLine('|' + String.times('---|', cells.length));
+        c.putLine('|' + strUtil.times('---|', cells.length));
         isFirst = false;
       }
     }
@@ -416,8 +417,8 @@ Backlog_TableNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_ContentsNode = function() {};
-Backlog_ContentsNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_ContentsNode = function() {};
+Backlog_ContentsNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^#contents$/,
 
   parse: function() {
@@ -428,8 +429,8 @@ Backlog_ContentsNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_ImageNode = function() {};
-Backlog_ImageNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_ImageNode = function() {};
+Backlog_ImageNode.prototype = extendObject(new Backlog_Node(), {
   pattern: /^#(?:image|thumbnail)\(([^)]+)\)$/,
 
   parse: function(match) {
@@ -440,7 +441,7 @@ Backlog_ImageNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_AttachNode = {
+var Backlog_AttachNode = {
   replaceInLine: function(text) {
     return text.replace(/#attach\(([^)]+):(\d+)\)/g, function(_, name, id) {
       return '[' + name + '][' + id + ']';
@@ -449,7 +450,7 @@ Backlog_AttachNode = {
 };
 
 
-Backlog_LinkNode = {
+var Backlog_LinkNode = {
   replaceInLine: function(text) {
     return text.replace(/\[\[((?:[^\]]|\][^\]])+)\]\]/g, function(_, name) {
       var m = decomposite(/[>:]([^:]+:[^:]+)$/, name);
@@ -461,8 +462,8 @@ Backlog_LinkNode = {
   },
 };
 
-Backlog_PNode = function() {};
-Backlog_PNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_PNode = function() {};
+Backlog_PNode.prototype = extendObject(new Backlog_Node(), {
   parse: function() {
     var c = this.self.context;
     c.putLine(Backlog_InLine.parsePart(c.next(), c));
@@ -470,8 +471,8 @@ Backlog_PNode.prototype = Object.extend(new Backlog_Node(), {
 });
 
 
-Backlog_SectionNode = function() {};
-Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
+var Backlog_SectionNode = function() {};
+Backlog_SectionNode.prototype = extendObject(new Backlog_Node(), {
   childNodes: [
     'hn', 'quote', 'quote2', 'list', 'code', 'table', 'contents', 'image'
   ],
@@ -536,3 +537,7 @@ Backlog_SectionNode.prototype = Object.extend(new Backlog_Node(), {
     };
   }
 });
+
+if (global) {
+  global.Backlog = Backlog;
+}

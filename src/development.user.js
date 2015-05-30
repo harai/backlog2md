@@ -1,9 +1,7 @@
 // ==UserScript==
-// @name           Extreme Markup Editor™ for Blogger dev version
+// @name           Backlog2Markdown dev version
 // @namespace      https://github.com/harai/
 // @description    Description
-// @include        http://www.blogger.com/blogger.g*
-// @include        https://www.blogger.com/blogger.g*
-// @require backlog-markup.js
-// @require blogger.js
+// @include        https://tarosky.backlog.jp/*
+// @grant none
 // ==/UserScript==
