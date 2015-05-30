@@ -1,3 +1,4 @@
+
 var bloggerBacklogMarkup = function() {
   var insertBefore = function(base, inserting) {
     base.parentNode.insertBefore(inserting, base);
@@ -22,6 +23,36 @@ var bloggerBacklogMarkup = function() {
     return b;
   };
 
+  var domChecker = (function() {
+    var selectors = [];
+    var foundNodes = [];
+
+    var observer = new MutationObserver(function() {
+      selectors.forEach(function (s) {
+        jQuery(s.selector).each(function () {
+          if (jQuery.inArray(this, foundNodes) !== -1) {
+            return;
+          }
+          foundNodes.push(this);
+          s.callback(this);
+        });
+      });
+    });
+
+    return {
+      add: function (selector, target, callback) {
+        selectors.push({
+          selector: selector,
+          callback: callback
+        });
+
+        if (target) {
+          observer.observe(target, {childList: true, subtree: true});
+        }
+      }
+    };
+  })();
+
   var wikiPage = (function() {
     var el = document.getElementById('page.content');
     return {
@@ -43,8 +74,40 @@ var bloggerBacklogMarkup = function() {
     };
   })();
 
+  var issuePage = (function() {
+    var el = document.getElementById('issue.description');
+    return {
+      isShown: function() {
+        return !!el;
+      },
+
+      getValue: function() {
+        return el.value;
+      },
+
+      setValue: function(v) {
+        el.value = v;
+      },
+
+      insertButton: function(btn) {
+        insertBefore(document.getElementById('setParentIssue'), btn);
+      },
+    };
+  })();
+
+  var commentPage = (function() {
+    domChecker.add('.Comment-editor', document.getElementById('comments'), function (el) {
+      var te = el.querySelector('textarea');
+      var btn = createButton(function() {
+        te.value = new Backlog().parse(te.value);
+      });
+      insertBefore(el.querySelector('button'), btn);
+    });
+  })();
+
   var pages = [
     wikiPage,
+    issuePage,
   ];
 
   var page = pages.filter(function(p) {

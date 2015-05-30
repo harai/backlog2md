@@ -1,7 +1,11 @@
 #!/bin/sh
 
+mkdir -p ./temp ./output
 while inotifywait -r -e modify ./src/ ./test/; do
   node_modules/.bin/mocha --compilers coffee:coffee-script/register --recursive
-  cat src/development.user.js src/backlog-markup.js src/blogger.js > output/development.firefox.user.js
+  cat \
+    src/development.user.js \
+    src/backlog-markup.js \
+    src/blogger.js > temp/development.firefox.user.js
   date
 done

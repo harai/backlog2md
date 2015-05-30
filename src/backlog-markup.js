@@ -1,4 +1,4 @@
-// from prototype.js
+
 var extendObject = function(destination, source) {
   for (property in source) {
     destination[property] = source[property];

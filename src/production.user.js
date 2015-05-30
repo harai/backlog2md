@@ -1,13 +1,12 @@
 // ==UserScript==
-// @name           Extreme Markup Editor for Blogger™
+// @name           Backlog™2Markdown
 // @namespace      https://github.com/harai/
-// @description    Write blog posts with Extreme Markup, which resembles Backlog Markup and is much easier to use than Markdown.
-// @include        http://www.blogger.com/blogger.g*
-// @include        https://www.blogger.com/blogger.g*
+// @description    Convert Backlog™ notation to Markdown.
+// @include        https://*.backlog.jp/*
 // @version 0.0
 // ==/UserScript==
 //
-//  Copyright (C) 2013 Akihiro HARAI
+//  Copyright (C) 2015 Akihiro HARAI
 //  Originally created by edvakf
 //
 //   The JavaScript code in this page is free software: you can
