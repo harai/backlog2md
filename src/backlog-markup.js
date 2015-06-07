@@ -540,4 +540,5 @@ Backlog_SectionNode.prototype = extendObject(new Backlog_Node(), {
 
 if (global) {
   global.Backlog = Backlog;
+  global.Backlog_InLine = Backlog_InLine;
 }

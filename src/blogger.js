@@ -101,6 +101,9 @@ var bloggerBacklogMarkup = function() {
       var te = el.querySelector('textarea');
       var btn = createButton(function() {
         te.value = new Backlog().parse(te.value);
+        // This keyboard action is needed for Backlog to tell the change.
+        te.dispatchEvent(new KeyboardEvent('keydown', {key: 'Shift'}));
+        te.dispatchEvent(new KeyboardEvent('keyup', {key: 'Shift'}));
       });
       insertBefore(el.querySelector('button'), btn);
     });

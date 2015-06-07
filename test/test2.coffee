@@ -4,29 +4,29 @@ require "../src/backlog-markup"
 
 
 describe 'Backlog', ->
-  # describe 'Backlog_InLine.parsePart', ->
-  #   parse = null
-  #
-  #   beforeEach ->
-  #     parse = Backlog_InLine.parsePart
-  #
-  #   it "''", ->
-  #     assert.equal parse("aaa''bb''ccc"), 'aaa **bb** ccc'
-  #
-  #   it "'''", ->
-  #     assert.equal parse("aaa'''bb'''ccc"), 'aaa *bb* ccc'
-  #
-  #   it '%%', ->
-  #     assert.equal parse("aaa%%bb%%ccc"), 'aaa ~~bb~~ ccc'
-  #
-  #   it 'multiple', ->
-  #     assert.equal parse("aaa''bbb''%%ccc%%ddd"), 'aaa **bbb** ~~ccc~~ ddd'
-  #
-  #   it 'nested', ->
-  #     assert.equal parse("a''a'''a%%bb%%c'''c''c"), 'a **a *a ~~bb~~ c* c** c'
-  #
-  #   it 'same multiple', ->
-  #     assert.equal parse("aaa''bbb'' ''ccc''ddd"), 'aaa **bbb** **ccc** ddd'
+  describe 'Backlog_InLine.parsePart', ->
+    parse = null
+
+    beforeEach ->
+      parse = Backlog_InLine.parsePart
+
+    it "''", ->
+      assert.equal parse("aaa''bb''ccc"), 'aaa **bb** ccc'
+
+    it "'''", ->
+      assert.equal parse("aaa'''bb'''ccc"), 'aaa *bb* ccc'
+
+    it '%%', ->
+      assert.equal parse("aaa%%bb%%ccc"), 'aaa ~~bb~~ ccc'
+
+    it 'multiple', ->
+      assert.equal parse("aaa''bbb''%%ccc%%ddd"), 'aaa **bbb** ~~ccc~~ ddd'
+
+    it 'nested', ->
+      assert.equal parse("a''a'''a%%bb%%c'''c''c"), 'a **a *a ~~bb~~ c* c** c'
+
+    it 'same multiple', ->
+      assert.equal parse("aaa''bbb'' ''ccc''ddd"), 'aaa **bbb** **ccc** ddd'
 
   describe '#parse()', ->
     h = null
