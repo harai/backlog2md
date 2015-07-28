@@ -1,0 +1,5 @@
+test:
+  override:
+    - node_modules/.bin/mocha --reporter mocha-junit-reporter --compilers coffee:coffee-script/register --recursive:
+      environment:
+        MOCHA_FILE: $CIRCLE_TEST_REPORTS/mocha.xml
